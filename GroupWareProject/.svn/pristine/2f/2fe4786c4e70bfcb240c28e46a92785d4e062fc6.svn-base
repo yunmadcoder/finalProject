@@ -1,0 +1,45 @@
+package kr.or.ddit.groupware.mapper.approval;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.ApprovalVO;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.OrganizationTreeVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkGroupVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkVO;
+import kr.or.ddit.groupware.vo.SanctionerVO;
+
+/**
+ * 전자결재 SQL Mapper
+ * @author 이명문
+ * @version 1.0
+ * @see IApprovalMapper
+ */
+public interface IApprovalMapper {
+
+	List<ApprovalVO> selectDraftList(ApprovalVO approvalVO);
+
+	List<OrganizationTreeVO> selectOragnTree();
+
+	List<EmployeeVO> selectEmplList();
+
+	int insertSanctionerGroup(SanctionerBookmarkGroupVO vo);
+
+	int insertSanctioner(SanctionerBookmarkVO vo);
+
+	List<SanctionerBookmarkGroupVO> selectMyLine(SanctionerBookmarkGroupVO vo);
+
+	int deleteMyLine(SanctionerBookmarkGroupVO vo);
+
+	int deleteMyLineGroup(SanctionerBookmarkGroupVO vo);
+
+	int insertApproval(ApprovalVO approvalVO);
+
+	void insertSanctioners(SanctionerVO sanctionerVO);
+
+	ApprovalVO selectApprovalDocument(int aprovlNo);
+
+	List<ApprovalVO> selectApprovalList(SanctionerVO sanctionerVO);
+	
+
+}

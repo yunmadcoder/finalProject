@@ -1,0 +1,338 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/project/css/project/main.css" />
+<form>
+	<input type="hidden" id="todoCnt" value="${todoCnt }">
+	<input type="hidden" id="doingCnt" value="${doingCnt }">
+	<input type="hidden" id="doneCnt" value="${doneCnt }">
+</form>
+<div class="prjct-content">
+	<div class="col-yen-10">
+		<div class="nav flex-column nav-pills mb-4 mb-md-0" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+			<a class="nav-link" id="v-pills-home-tab" data-bs-toggle="pill" href="javascript:void(0);" onclick="moveToFormPage();" role="tab" aria-controls="v-pills-home" aria-selected="false">
+				<i class="fa-solid fa-plus"></i> 새 프로젝트
+			</a>
+			<br />
+			<div class="nav-link">
+				<i class="fa-duotone fa-users" style="margin-right: 10px;"></i> 내 프로젝트
+			</div>
+			<div class="myPrjct">
+				<c:forEach var="project" items="${prjctList }">
+					<div class="btn-prjct">
+						<span class="side-stick yen-${project.prjctColorCode }"></span>
+						<a class="nav-link" id="v-pills-my-tab" data-bs-toggle="pill" href="javascript:void(0);" onclick="moveToProjectMain(${project.prjctNo});" role="tab" aria-controls="v-pills-profile" aria-selected="false"> ${project.prjctNm } </a>
+					</div>
+				</c:forEach>
+			</div>
+		</div>
+	</div>
+	<div class="col-yen-90">
+		<ul class="nav nav-underline prjct-tab" id="myTab" role="tablist">
+			<li class="nav-item" role="presentation">
+				<a class="nav-link active" id="prjct-home-tab" data-bs-toggle="tab" href="#prjct-home" role="tab" aria-controls="prjct-home" aria-expanded="true" aria-selected="false" tabindex="-1">
+					<span>홈</span>
+				</a>
+			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="prjct-task-tab" data-bs-toggle="tab" href="#prjct-task" role="tab" aria-controls="prjct-task" aria-selected="false" tabindex="-1">
+					<span>업무</span>
+				</a>
+			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="prjct-gantt-tab" data-bs-toggle="tab" href="#prjct-gantt" role="tab" aria-controls="prjct-gantt" aria-selected="true">
+					<span>간트차트</span>
+				</a>
+			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="prjct-cal-tab" data-bs-toggle="tab" href="#prjct-cal" role="tab" aria-controls="prjct-cal" aria-selected="true">
+					<span>캘린더</span>
+				</a>
+			</li>
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" id="prjct-report-tab" data-bs-toggle="tab" href="#prjct-report" role="tab" aria-controls="prjct-report" aria-selected="true">
+					<span>업무일지</span>
+				</a>
+			</li>
+		</ul>
+		<div class="tab-content tabcontent-border p-3" id="myTabContent">
+			<!-- 홈 탭 -->
+			<div role="tabpanel" class="tab-pane fade active show" id="prjct-home" aria-labelledby="prjct-home-tab">
+				<div class="row">
+					<!-- 세로줄 1 -->
+					<div class="col-yen-20">
+						<!-- 업무 상태 -->
+						<div class="card w-100">
+							<div class="card-body">
+								<div>
+									<h4 class="card-title fw-semibold mb-1">업무 상태</h4>
+<!-- 									<p class="card-subtitle">Every month</p> -->
+									<canvas id="task-status-chart" width="200" height="200"></canvas>
+									<div class="col">
+										<span class="mb-1 badge yen-red">대기</span>
+										<span class="mb-1 badge yen-blue">진행 중</span>
+										<span class="mb-1 badge yen-yellow">완료</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- / 업무 상태 -->
+						<!-- 업무기한 -->
+						<div class="card w-100">
+							<div class="card-body">
+								<div>
+									<h4 class="card-title fw-semibold mb-1">업무 기한</h4>
+									<p class="card-subtitle">Every month</p>
+									<div id="dueDateGraph" class="mx-n4">
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- /업무기한 -->
+					</div>
+					<!-- /세로줄 1 -->
+					<!-- 세로줄2 -->
+					<div class="col-yen-55">
+						<!-- 캘린더 -->
+						<div class="card w-100">
+							<div>
+								<div class="row gx-0">
+									<div class="col-lg-12">
+										<div class="p-4 calender-sidebar app-calendar">
+											<div id="calendar"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- / 캘린더 -->
+					</div>
+					<!-- /세로줄2 -->
+					<!-- 세로줄3 -->
+					<div class="col-yen-25">
+						<!-- 참여자 -->
+						<div class="card w-100">
+							<div class="card-body">
+								<h5 class="card-title fw-semibold mb-9">구성원</h5>
+								<c:forEach var="empl" items="${emplList }">
+									<div class="py-6 d-flex align-items-center">
+										<div class="rounded-circle round-40">
+											<img class="round-40 tl-profile-img" src="/profile/view/${empl.emplProflPhoto }" alt="user">
+										</div>
+										<div class="ms-3">
+											<h6 class="mb-0 fw-semibold">${empl.emplNm } ${empl.clsfNm }</h6>
+											<span class="fs-3">${empl.deptNm }</span>
+										</div>
+										<div class="ms-auto">
+											<i class="fa-sharp fa-regular fa-comment fs-5"></i>
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						</div>
+						<!-- /참여자 -->
+					</div>
+					<!-- /세로줄3 -->
+				</div>
+			</div>
+			<!-- /홈탭 -->
+			<div class="tab-pane fade" id="prjct-task" role="tabpanel" aria-labelledby="prjct-task-tab">
+				<p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+			</div>
+			<div class="tab-pane fade" id="prjct-gantt" role="tabpanel" aria-labelledby="prjct-gantt-tab">
+				<p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
+			</div>
+			<div class="tab-pane fade" id="prjct-cal" role="tabpanel" aria-labelledby="prjct-cal-tab">
+				<p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
+			</div>
+			<div class="tab-pane fade" id="prjct-report" role="tabpanel" aria-labelledby="prjct-report-tab">
+				<p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Import Js Files -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.36.0/apexcharts.min.js"></script> -->
+<script src="../../../resources/project/js/source/index.global.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/vendor/libs/apexcharts/dist/apexcharts.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/project/js/project/project_main.js"></script>
+<script>
+$(function () {
+
+	// 업무상태 도넛 차트--
+	const taskStatusChart = document.getElementById("task-status-chart");
+	
+	const data = {
+		type: 'doughnut',
+		data: {
+			labels: ["대기", "진행중", "완료"],
+			datasets: [
+				{
+					backgroundColor: [
+						'rgb(255, 99, 132)',
+						'rgb(54, 162, 235)',
+						'rgb(255, 205, 86)'
+					],
+					data: ['${todoCnt}', '${doingCnt}', '${doneCnt}']
+				}
+			]
+		},
+		options: {
+			responsive: false,
+			legend: {
+				display: false,
+				position: 'bottom',
+			}
+		}
+	};
+
+	new Chart(taskStatusChart, data);
+	// --업무상태 도넛 차트
+
+	
+	// 캘린더--
+	var calendarElem = document.getElementById("calendar");
+	// 풀캘린더 헤더 설정
+	var headerToolbar = {
+		start: 'prev,next',
+		center: 'title',
+		end: 'dayGridMonth,dayGridWeek,dayGridDay'
+	};
+	
+	//풀캘린더 설정
+	var calendarOption = {
+		height: '800px',
+		expandRows: true, // 화면에 맞게 높이 재설정
+		slotMinTime: '09:00', // Day 캘린더 시작 시간
+		slotMaxTime: '18:00', // Day 캘린더 종료 시간
+		// 맨 위 헤더 지정
+		headerToolbar: headerToolbar,
+		initialView: 'dayGridMonth',
+		locale: 'kr',
+		nowIndicator: true, // 현재 시간 마크
+		dayMaxEvents: true, // 이벤트가 오버되면 높이 제한 (+ 몇 개식으로 표현)
+		dayMaxEventRows: true, // Row 높이보다 많으면 +숫자 more 링크
+		nowIndicator: true,
+		eventClick: function (e) {
+			var object = e.el.fcSeg.eventRange.def;
+			showDetailSchedule(object.publicId);
+			return false;
+		}
+	};
+	
+	
+	calendarOption.events = JSON.parse('${PrjctSchdulList}');
+	
+	var calendar = new FullCalendar.Calendar(calendarElem, calendarOption);
+	calendar.render();
+	
+	// --캘린더 
+	
+	// 업무기한 그래프 --
+	var day1 = new Date();
+	var day2 = new Date();
+	var day3 = new Date();
+	var day4 = new Date();
+	var day5 = new Date();
+	var day6 = new Date();
+	var day7 = new Date();
+	day1.setDate(day1.getDate()+0);
+	day2.setDate(day1.getDate()+1);
+	day3.setDate(day1.getDate()+2);
+	day4.setDate(day1.getDate()+3);
+	day5.setDate(day1.getDate()+4);
+	day6.setDate(day1.getDate()+5);
+	day7.setDate(day1.getDate()+6);
+	var dueDateData = JSON.parse('${dueDateJson}');
+	
+	var dueDateOptions = {
+			  chart: {
+			    type: 'bar'
+			  },
+			  series: [{
+				name: "마감 업무 수",
+			    data: [{
+			      x: day1,
+			      y: dueDateData.D1
+			    }, {
+			      x: day2,
+			      y: dueDateData.D2
+			    }, {
+			      x: day3,
+			      y: dueDateData.D3
+			    }, {
+			      x: day4,
+			      y: dueDateData.D4
+			    }, {
+			      x: day5,
+			      y: dueDateData.D5
+			    }, {
+			      x: day6,
+			      y: dueDateData.D6
+			    }, {
+			      x: day7,
+			      y: dueDateData.D7
+			    }]
+			  }],
+
+			  chart: {
+			    toolbar: { show: false },
+			    height: 200,
+			    type: "bar",
+			    fontFamily: "inherit",
+			    foreColor: "#adb0bb",
+			    offsetX:-10
+			  },
+			  plotOptions: {
+			    bar: {
+			      borderRadius: 4,
+			      columnWidth: "45%",
+			      distributed: true,
+			      endingShape: "rounded",
+			    },
+			  },
+
+			  dataLabels: {
+			    enabled: false,
+			  },
+			  legend: {
+			    show: false
+			  },
+			  grid: {
+			    yaxis: {
+			      lines: { show: false },
+			    },
+			    xaxis: {
+			      lines: { show: false },
+			    },
+			  },
+			  xaxis: {
+			    axisBorder: { show: false },
+			    axisTicks: { show: false },
+			    type: "datetime",
+			    labels: {
+			    	datetimeFormatter : { day: 'dd'},
+				    offsetX:10
+			    }
+			  },
+			  yaxis: {
+			    labels: { show: false },
+			  },
+			  tooltip: {
+				y: { formatter: function(val, index) {
+			        return val.toFixed(0);
+			      }},
+			    theme: "dark",
+			  },
+			};
+		
+		  var chart = new ApexCharts(document.querySelector("#dueDateGraph"), dueDateOptions);
+		  chart.render();
+
+		  // 업무기한 그래프 --
+
+	
+});
+</script>

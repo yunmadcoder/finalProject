@@ -1,0 +1,68 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<div class="card position-relative overflow-hidden rounded-0">
+	<div class="shop-part d-flex w-100">
+		<div class="flex-shrink-0" style="border-right: 1px solid #ddd; width: 13%" id="sideArea">
+			<div class="px-9 pt-4 pb-3">
+				<a href="/drive">
+					<h3 class="mb-4" style="font-weight: 600; margin-left: 10px;">
+						<i class="fa-sharp fa-regular fa-file-signature fa-fw fa"></i>
+						결재 통계
+					</h3>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="company">
+					<span class="fs-6 ms-5">전체 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="department">
+					<span class="fs-6 ms-5">부서별 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="private">
+					<span class="fs-6 ms-5">개인자료실</span>
+				</a>
+			</div>
+		</div>
+		<div class="card-body p-4 pb-0" style="min-height: 85vh;">
+			<div class="d-flex align-items-center gap-6 mb-2">
+				<h5 class="fs-5 mb-0 d-none d-lg-block flex-grow-1" data-title="">전사 자료실</h5>
+				<button class="btn rounded-0" style="border: 1px solid #ddd;" id="all-log-btn">자료실 전체 로그</button>
+				<form class="position-relative">
+					<input type="text" class="form-control search-chat py-2 ps-5 rounded-0" id="drive-search" placeholder="파일 검색...">
+					<i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+				</form>
+				<button class="btn btn-outline-light-indigo text-dark fw-semibold rounded-0 py-8 px-5" id="drive-upload">파일 업로드</button>
+			</div>
+			<div class="w-100 p-2 pb-3 bt-line">
+				<div class="d-inline-block">
+					<a href="#" class="me-2" id="new-folder">
+						<i class="fa-sharp fa-regular fa-folder fa-xl fa-fw"></i>
+						<span>새폴더</span>
+					</a>
+					<a href="#" class="me-2" id="file-download">
+						<i class="fa-sharp fa-regular fa-arrow-down-to-line fa-xl fa-fw"></i>
+						<span>다운로드</span>
+					</a>
+					<a href="#" class="me-2" id="file-delete">
+						<i class="fa-sharp fa-regular fa-trash fa-xl fa-fw"></i>
+						<span>삭제</span>
+					</a>
+					<a href="#" class="me-2" id="zip-download">
+						<i class="fa-sharp fa-regular fa-file-zipper fa-xl fa-fw"></i>
+						<span>목록 다운로드</span>
+					</a>
+				</div>
+			</div>
+			<div id="createFolderWrap" class="d-none justify-content-start align-items-center mt-2 bt-line" style="padding-bottom: 8px;">
+				<span class="d-inline-block" style="font-weight: 600; height: 24px;">폴더 명</span>
+				<input class="form-control form-control-sm w-25 rounded-0 mx-3" id="fNameInput" type="text" placeholder="폴더 이름을 입력하세요.">
+				<button class="btn btn-sm btn-gray rounded-0 me-1" data-confirm="new-folder">확인</button>
+				<button class="btn btn-sm btn-gray rounded-0" data-cancel="new-folder">취소</button>
+			</div>
+		</div>
+	</div>
+</div>

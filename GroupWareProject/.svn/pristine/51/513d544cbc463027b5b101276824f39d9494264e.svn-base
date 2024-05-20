@@ -1,0 +1,199 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<div class="card">
+	<div>
+		<div class="row gx-0">
+			<div class="col-lg-3">
+			<div class="p-4 calendar-sidebar">
+				<ul class="nav flex-column">
+					<li class="nav-item">
+						<a href="#" class="nav-link" id="all-resources">전체설비</a>
+						<ul class="submenu">
+							<li><a href="#" class="nav-link" id="meeting-rooms">회의실</a></li>
+							<li><a href="#" class="nav-link" id="vehicles">차량</a></li>
+							<li><a href="#" class="nav-link" id="supplies">비품</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+			<div class="col-lg-9">
+				<div class="p-4 calender-sidebar app-calendar">
+					<div id="calendar"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">일정 추가하기</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				예약할자원:
+				<input type="text" id="resourceName" readonly="readonly">
+				<br>
+				일정이름 :
+				<input type="text" id="title" />
+				<br /> 시작시간 :
+				<input type="" id="start" />
+				<br /> 종료시간 :
+				<input type="" id="end" />
+				<br>
+				예약자:
+				<input type="" id="loggedInUserName" value="<%= session.getAttribute("") %>" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				<button type="button" class="btn btn-primary" id="saveChanges">신청</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal END -->
+<%-- <script src="${pageContext.request.contextPath }/resources/project/js/sweetalert_custom.js"></script> --%>
+<%-- <script src="${pageContext.request.contextPath }/resources/project/js/source/index.global.min.js"></script> --%>
+ <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar;
+
+    // 자원 목록
+    const resourcesForRooms = [
+        { id: '1', title: '제 1회의실' },
+        { id: '2', title: '제 2회의실' },
+        { id: '3', title: '제 3회의실' },
+        { id: '4', title: '제 4회의실' },
+        { id: '5', title: '제 5회의실' }
+    ];
+    const resourcesForVehicles = [
+        { id: '6', title: '차량 A' },
+        { id: '7', title: '차량 B' },
+        { id: '8', title: '차량 C' },
+        { id: '9', title: '차량 D' },
+        { id: '10', title: '차량 E' }
+    ];
+    const resourcesForSupplies = [
+        { id: '11', title: '프로젝터1' },
+        { id: '12', title: '프로젝터2' },
+        { id: '13', title: '프로젝터3' },
+        { id: '14', title: '노트북1' },
+        { id: '15', title: '노트북2' },
+        { id: '16', title: '노트북3' },
+    ];
+
+    // 캘린더 설정 및 렌더링 함수
+    function setupCalendar(resources) {
+        if (calendar) {
+            calendar.destroy(); // 이전 캘린더 인스턴스 제거
+        }
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'resourceTimelineDay',
+            height: '700px',
+            expandRows: true,
+            slotMinTime: '09:00',
+            slotMaxTime: '22:00',
+            slotDuration: '00:30:00',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'resourceTimelineDay',
+            },
+            locale: 'ko',
+            selectable: true,
+            selectMirror: true,
+            navLinks: true,
+            editable: true,
+            dayMaxEventRows: true,
+            nowIndicator: true,
+            resources: resources,
+            select: function(arg) {
+                $('#start').val(formatDate(arg.startStr));
+                $('#end').val(formatDate(arg.endStr));
+                $('#resourceName').val(arg.resource.title);
+                $('#exampleModal').modal('show');
+                calendar.unselect();
+            }
+        });
+        calendar.render();
+    }
+
+    // 이벤트 핸들러 등록
+    document.getElementById('meeting-rooms').addEventListener('click', function() {
+        setupCalendar(resourcesForRooms);
+    });
+    document.getElementById('vehicles').addEventListener('click', function() {
+        setupCalendar(resourcesForVehicles);
+    });
+    document.getElementById('supplies').addEventListener('click', function() {
+        setupCalendar(resourcesForSupplies);
+    });
+});
+
+// 날짜 포맷 함수
+function formatDate(date) {
+    var d = new Date(date);
+    var month = ('0' + (d.getMonth() + 1)).slice(-2),
+        day = ('0' + d.getDate()).slice(-2),
+        year = d.getFullYear(),
+        hour = ('0' + d.getHours()).slice(-2),
+        minutes = ('0' + d.getMinutes()).slice(-2);
+    return [year, month, day].join('-') + ' ' + hour + ':' + minutes;
+}
+
+document.getElementById('saveChanges').addEventListener('click', function() {
+    var resourceName = document.getElementById('resourceName').value;
+    var eventTitle = document.getElementById('title').value;
+    var startTime = document.getElementById('start').value;
+    var endTime = document.getElementById('end').value;
+    var reserverName = document.getElementById('loggedInUserName').value;
+
+    console.log("Sending data:", {
+        resourceName: resourceName,
+        title: title,
+        start: start,
+        end: end,
+        reserverName: loggedInUserName
+    });
+
+    // 데이터 유효성 검사
+    if (!eventTitle.trim() || !startTime || !endTime || !reserverName) {
+        alert("모든 필드를 채워주세요.");
+        return;
+    }
+
+
+// AJAX 요청 설정
+$.ajax({
+    url: '/addReservation',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+        resourceName: resourceName,
+        title: eventTitle,
+        start: startTime,
+        end: endTime,
+        reserverName: reserverName
+    }),
+    beforeSend: function(xhr) {
+        xhr.setRequestHeader(header, token);
+    },
+    success: function(response) {
+        $('#reservationModal').modal('hide');
+        alert("예약이 성공적으로 등록되었습니다.");
+        // 성공 후 필요한 추가 로직 처리
+    },
+    error: function(xhr, status, error) {
+        alert("예약 등록에 실패했습니다. 오류: " + error);
+    }
+});
+});
+
+
+</script>

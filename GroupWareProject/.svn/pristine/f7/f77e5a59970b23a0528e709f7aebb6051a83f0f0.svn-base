@@ -1,0 +1,17 @@
+package kr.or.ddit.groupware.controller.drive;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * 자료실 컨트롤러
+ * 
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see DriveController
+ */
+@Controller
+@RequestMapping("/drive")
+public class DriveController {
+
+}

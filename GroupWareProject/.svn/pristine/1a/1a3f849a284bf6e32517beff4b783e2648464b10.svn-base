@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.rental.IRentalMapper">
+
+	<sql id="commonInsert">
+		INSERT INTO EQUIPMENT_RENTAL (
+	           	ERNT_NO,
+				EMPL_NO,
+				EQPNM_CD,
+				ERNT_QY,
+				ERNT_RESN,
+				PRMISN_YN,
+				ERNT_BEGIN_DT,
+				ERNT_END_DT,
+	<!-- 			ERNT_RTURN_DT -->
+				RGSDE,
+				RESOURCE_TYPE
+	        ) VALUES (
+	            #{erntNo},  
+	            #{emplNo},
+	            #{eqpnmCd},
+	            #{erntQy},
+	            #{erntResn},
+	            'PENDING',
+	            #{erntBeginDt, jdbcType=VARCHAR},
+	            #{erntEndDt, jdbcType=VARCHAR},
+	<!--             #{erntRturnDt, jdbcType=VARCHAR}, -->
+	            SYSDATE,
+	            #{resourceType}
+	        )
+	</sql>
+
+
+	<insert id="rentVehicle" parameterType="rentalVO">
+		<selectKey keyProperty="erntNo" resultType="int" order="BEFORE">
+			select seq_EQUIPMENT_RENTAL.nextval from dual
+		</selectKey>
+		<include refid="commonInsert" />
+	</insert>
+	
+	<insert id="rentSupplies" parameterType="rentalVO">
+		<selectKey keyProperty="erntNo" resultType="int" order="BEFORE">
+			select seq_EQUIPMENT_RENTAL.nextval from dual
+		</selectKey>
+		<include refid="commonInsert" />
+	</insert>
+
+	<select id="findRentalByResourceType" parameterType="map" resultType="rentalVO">
+	        SELECT
+            ERNT_NO,
+			EMPL_NO,
+			EQPNM_CD,
+            TO_CHAR(ERNT_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') AS ERNT_BEGIN_DT,
+            TO_CHAR(ERNT_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS ERNT_END_DT,
+            ERNT_RESN,
+            ERNT_QY,
+            RESOURCE_TYPE,
+            PRMISN_YN
+	        FROM
+	            EQUIPMENT_RENTAL
+	        WHERE
+	        RESOURCE_TYPE IN ( 'vehicle', 'supplies')
+	        AND
+	        
+	        (PRMISN_YN ='Y' OR PRMISN_YN='PENDING')
+	    
+	</select>
+
+    <select id="findOverlappingRentals" resultType="rentalVO">
+    <![CDATA[
+    SELECT ERNT_NO, EMPL_NO, EQPNM_CD, RGSDE, ERNT_BEGIN_DT, ERNT_END_DT, RESOURCE_TYPE 
+    FROM EQUIPMENT_RENTAL
+    WHERE EQPNM_CD = #{eqpnmCd}
+      AND (
+          ERNT_BEGIN_DT < #{erntEndDt,jdbcType=VARCHAR} AND ERNT_END_DT > #{erntBeginDt,jdbcType=VARCHAR}
+      )
+    ]]>
+	</select>
+      
+      <delete id="cancleRentalVehicle" parameterType="rentalVO">
+		 	DELETE FROM EQUIPMENT_RENTAL
+	    	WHERE ERNT_NO = #{erntNo}
+	 </delete>
+	 
+	  <delete id="cancleRentalSupplies" parameterType="rentalVO">
+		 	DELETE FROM EQUIPMENT_RENTAL
+	    	WHERE ERNT_NO = #{erntNo}
+	  </delete>
+
+     <select id="selectRentalList" parameterType="pagingVO" resultType="rentalVO">
+			<![CDATA[
+        SELECT
+            a.ERNT_NO, 
+            a.EQPNM_CD,
+            a.ERNT_RESN,  
+            a.ERNT_BEGIN_DT,
+            a.ERNT_END_DT,
+            b.ITEM_NM,
+            b.ITEM_CODE,
+             a.rnum
+        FROM (
+            SELECT
+                ER.ERNT_NO, 
+                ER.EQPNM_CD,
+                ER.ERNT_RESN,  
+                ER.ERNT_BEGIN_DT,
+                ER.ERNT_END_DT,
+                V.ITEM_NM,
+                V.ITEM_CODE,
+                ROW_NUMBER() OVER (ORDER BY ER.ERNT_NO DESC) AS rnum
+            FROM EQUIPMENT_RENTAL ER
+            INNER JOIN RENT_ITEM V ON ER.EQPNM_CD = V.ITEM_CODE
+            
+             WHERE
+           ER.ERNT_NO LIKE '%' || #{searchWord} || '%' OR
+            V.ITEM_NM LIKE '%' || #{searchWord} || '%' OR
+            TO_CHAR(ER.ERNT_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') LIKE '%' || #{searchWord} || '%' OR
+            TO_CHAR(ER.ERNT_END_DT, 'YYYY-MM-DD HH24:MI:SS') LIKE '%' || #{searchWord} || '%' OR
+            ER.ERNT_RESN LIKE '%' || #{searchWord} || '%'
+            
+        ) a
+        INNER JOIN RENT_ITEM b ON a.EQPNM_CD = b.ITEM_CODE
+        WHERE a.rnum BETWEEN #{startRow} AND #{endRow}
+         ORDER BY ERNT_BEGIN_DT DESC
+        
+    	]]>
+	    </select>
+
+    
+        <!--대여신청내역 페이징  -->
+    	<select id="selectRentalCount" parameterType="String" resultType="int">
+		<![CDATA[
+		select count(ERNT_NO)
+		from EQUIPMENT_RENTAL ER
+		INNER JOIN RENT_ITEM R ON ER.EQPNM_CD = R.ITEM_CODE
+		where 1=1
+		and (ER.ERNT_NO LIKE '%' || #{searchWord} || '%' OR
+            R.ITEM_NM LIKE '%' || #{searchWord} || '%' OR
+            TO_CHAR(ER.ERNT_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') LIKE '%' || #{searchWord} || '%' OR
+            TO_CHAR(ER.ERNT_END_DT, 'YYYY-MM-DD HH24:MI:SS') LIKE '%' || #{searchWord} || '%' OR
+            ER.ERNT_RESN LIKE '%' || #{searchWord} || '%')
+		]]>
+		</select>
+	
+	<!--대여신청 알림받을 admin List -->
+	<select id="findEmployeesByAuthority" parameterType="empAuthorityVO"  resultType="int">
+		
+		SELECT EMPL_NO FROM EMP_AUTHORITY WHERE AUTHOR_NM = #{authorNm} AND USE_YN = 'Y'
+	
+	</select>
+	<!--대여승인시  -->
+	<update id="approveRental" parameterType="int">
+	    UPDATE EQUIPMENT_RENTAL
+	    SET PRMISN_YN = 'Y'
+	    WHERE ERNT_NO = #{erntNo}
+	</update>
+	
+	<!--대여반려시  -->
+	<update id="rejectRental" parameterType="int">
+	    UPDATE EQUIPMENT_RENTAL
+	    SET PRMISN_YN = 'N'
+	    WHERE ERNT_NO = #{erntNo}
+	</update>
+	
+	
+	
+</mapper>

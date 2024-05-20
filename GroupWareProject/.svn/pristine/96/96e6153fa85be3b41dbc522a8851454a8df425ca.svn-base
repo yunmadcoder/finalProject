@@ -1,0 +1,24 @@
+$(function() {
+    let items = $('.accordion-button');
+    let icons = $('.fa');
+
+    items.on('mouseenter', function(e) {
+        let span = $(this).children()[0];
+        $(span).css('color', 'cadetblue');
+    }).on('mouseleave', function(e) {
+        let span = $(this).children()[0];
+        $(span).css('color', 'black');
+    });
+    
+    icons.on('mouseenter', function(e) {
+        $(this).addClass('fa-beat');       
+    }).on('mouseleave', function(e) {
+        $(this).removeClass('fa-beat');
+    });
+
+    const popover = new bootstrap.Popover('.approval-popover', {
+        trigger: 'focus'
+    })
+
+});
+

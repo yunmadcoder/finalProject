@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.service.approval;
+
+/**
+ * 전자 결재 서비스 구현체
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see ApprovalServiceImpl
+ */
+public class ApprovalServiceImpl implements IApprovalService {
+
+}

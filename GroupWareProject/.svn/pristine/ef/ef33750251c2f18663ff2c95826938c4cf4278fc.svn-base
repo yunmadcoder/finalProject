@@ -1,0 +1,30 @@
+package kr.or.ddit.groupware.service.answer;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.groupware.mapper.answer.IAnswerMapper;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.AnswerVO;
+
+@Service
+public class AnswerServiceImpl implements IAnswerService {
+
+	@Inject
+	private IAnswerMapper answerMapper;
+
+	@Override
+	public void insertAnswer(AnswerVO answerVO) {
+		 answerMapper.insertAnswer(answerVO);
+	}
+	
+	
+
+	@Override
+	public List<AnswerVO> selectAnswer(int bbscttNo) {
+		return answerMapper.selectAnswer(bbscttNo);
+	}
+}

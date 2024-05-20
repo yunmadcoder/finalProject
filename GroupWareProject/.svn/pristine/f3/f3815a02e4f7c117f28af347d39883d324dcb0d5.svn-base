@@ -1,0 +1,12 @@
+package kr.or.ddit.groupware.mapper.answer;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.AnswerVO;
+
+public interface IAnswerMapper {
+
+	public int insertAnswer(AnswerVO answerVO);
+	
+	
+}

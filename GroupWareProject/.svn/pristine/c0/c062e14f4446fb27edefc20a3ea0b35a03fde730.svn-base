@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.reservation.IReservationMapper">
+	
+<!-- 	<resultMap type="mtgRoomReservVO" id="reservationMap"> -->
+<!-- 		<id property="resveNo" column="RESVE_NO"/> -->
+<!-- 		<id property="emplNo" column="EMPL_NO"/> -->
+<!-- 		<id property="mtngRoomNo" column="MTNG_ROOM_NO"/> -->
+<!-- 		<id property="resveBeginDt" column="RESVE_BEGIN_DT"/> -->
+<!-- 		<id property="resveEndDt" column="RESVE_END_DT"/> -->
+<!-- 		<id property="resveCn" column="RESVE_CN"/> -->
+<!-- 	</resultMap> -->
+	
+	<insert id="addRoomReserv" parameterType="mtgRoomReservVO">
+		<selectKey keyProperty="resveNo" resultType="int" order="BEFORE">
+			select seq_reservation.nextval from dual
+		</selectKey>
+	 <!--예약등록  -->
+	      INSERT INTO RESERVATION (
+	            RESVE_NO, 
+	            EMPL_NO,   
+	            MTNG_ROOM_NO, 
+	            RESVE_RGSDE, 
+	            RESVE_BEGIN_DT,
+	            RESVE_END_DT,
+	            RESVE_CN,
+	            RESOURCE_TYPE
+	        ) VALUES (
+	            #{resveNo},  
+	            #{emplNo},
+	            #{mtngRoomNo},
+	            SYSDATE,
+	            #{resveBeginDt, jdbcType=VARCHAR},
+	            #{resveEndDt, jdbcType=VARCHAR},
+	            #{resveCn},
+	            #{resourceType}
+	        )
+	   </insert>
+	 <!--예약조회  --> 
+	    <select id="findReservationsByResourceType" parameterType="map" resultType="mtgRoomReservVO">
+	        SELECT
+	            RESVE_NO,
+	            EMPL_NO,
+	            MTNG_ROOM_NO,
+	            TO_CHAR(RESVE_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') AS RESVE_BEGIN_DT,
+	            TO_CHAR(RESVE_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS RESVE_END_DT,
+	            RESVE_CN,
+	            RESOURCE_TYPE
+	        FROM
+	            RESERVATION
+	        WHERE
+	        RESOURCE_TYPE = #{resourceType}
+   		 </select>
+     <!-- 중복 예약 검사 -->
+	 	<select id="findOverlappingReservations" resultType="mtgRoomReservVO">
+	    <![CDATA[
+	     SELECT resve_no, empl_no, mtng_room_no, resve_rgsde, resve_begin_dt, resve_end_dt, resve_cn, resource_type 
+	     FROM reservation 
+	     WHERE mtng_room_no = #{mtngRoomNo} 
+	      AND (
+	         resve_begin_dt < #{resveEndDt,jdbcType=VARCHAR} AND resve_end_dt >#{resveBeginDt,jdbcType=VARCHAR}
+	      )
+	     ]]>
+		</select>
+	<!--예약수정  -->	
+		<update id="modifyRoomReserv" parameterType="mtgRoomReservVO">
+	    UPDATE RESERVATION
+	    SET
+	        RESVE_CN = #{resveCn},
+	        RESVE_BEGIN_DT =  #{resveBeginDt, jdbcType=VARCHAR},
+	        RESVE_END_DT = #{resveEndDt, jdbcType=VARCHAR}
+	    WHERE
+	        RESVE_NO =#{resveNo}
+		</update>
+	<!--예약취소  -->	 
+		 <delete id="cancleRoomReserve" parameterType="mtgRoomReservVO">
+		 	DELETE FROM RESERVATION
+	    	WHERE RESVE_NO = #{resveNo}
+		</delete>
+	<!--나의 예약 조회  -->	
+		<select id="selectReservList" parameterType="pagingVO" resultType="mtgRoomReservVO">
+		 <![CDATA[
+        SELECT
+            RESVE_NO, 
+            MTNG_ROOM_NO,
+            RESVE_CN,  
+            RESVE_BEGIN_DT ,
+            RESVE_END_DT 
+        FROM (
+            SELECT
+                RESVE_NO, 
+                MTNG_ROOM_NO,
+                RESVE_CN,  
+                RESVE_BEGIN_DT ,
+                RESVE_END_DT ,
+                ROW_NUMBER() OVER (ORDER BY RESVE_NO DESC) AS rnum
+            FROM RESERVATION
+        ) a
+        WHERE a.rnum BETWEEN #{startRow} AND #{endRow}
+        ]]>
+    
+    <!--예약내역 페이징  -->
+    </select>
+    	<select id="selectReservCount" parameterType="int"
+		resultType="int">
+		select count(RESVE_NO)
+		from RESERVATION
+		where 1=1
+<!-- 		<include refid="boardSearch"/> -->
+	</select>
+       		
+   
+</mapper>

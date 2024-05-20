@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+.prjct-content{
+  display: flex;
+}
+
+.prjct-tab .nav-item {
+  width: 100px;
+}
+.prjct-tab .nav-item .nav-link {
+  display: flex;
+  justify-content: center;
+}
+
+#task-status-chart {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.chart {
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.report-detail-info{
+  margin-left: 50px;
+  margin-top: 20px;
+}
+
+/* .report-detail-info textarea{
+  flex-grow: 1;
+} */

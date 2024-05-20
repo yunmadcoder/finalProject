@@ -1,0 +1,13 @@
+package kr.or.ddit.groupware.mapper.answer;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.AnswerVO;
+
+public interface IAnswerMapper {
+
+	public void insertAnswer(AnswerVO answerVO);
+	
+	public List<AnswerVO> selectAnswer(int bbscttNo);
+}

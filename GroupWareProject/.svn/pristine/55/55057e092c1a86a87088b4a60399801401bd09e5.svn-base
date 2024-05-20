@@ -1,0 +1,22 @@
+package kr.or.ddit.groupware.vo;
+
+import java.time.LocalDate;
+
+import lombok.Data;
+/**
+ * 문서양식VO
+ * @author <strong>이영주</strong>
+ * @see DocFormVO
+ */
+@Data
+public class DocFormVO {
+	private int formNo;
+	private String formNm;
+	private String formCn;
+	private String formTypeCode;
+	private String useYn;
+	private int formRegister;
+	private LocalDate formRgdde;
+	private int formUpdusr;
+	private LocalDate formUpdde;
+}

@@ -1,0 +1,84 @@
+$(function() {
+    let approvalBtn = $('#approval-btn');
+    let approvalModal = $('#approval-modal');
+    let actionBtn = $('#actionBtn');
+    let cancelBtn = $('#cancelBtn');
+    let modalExit = $('[data-exit]');
+    
+    approvalBtn.on('click', function(e) {
+        selectDocList();
+        toggleModal();
+    });
+
+    $(document).on('click', function(e) {
+        if($(e.target).is(approvalModal)) {
+            toggleModal();
+        }
+    });
+
+    modalExit.on('click', function(e) {
+    	if($(this).data('exit') == 'approval'){
+	        e.preventDefault();
+	        toggleModal();
+	        
+			collapseAllTrees();
+    	}
+    });
+    
+    actionBtn.on('click', function() {
+        var tree = $.ui.fancytree.getTree('#tree');
+        var node = tree.getActiveNode();
+        console.log(node);
+        if(node == null) {
+            showToast('양식을 선택해주세요!', 'error');
+            return;
+        }
+        console.log(node.title);
+        toggleModal();
+        let docNo = node.key.split('.')[1];
+        location.href='/approval/form?docNo='+docNo;
+    });
+    
+    cancelBtn.on('click', function() {
+    	toggleModal();
+    	collapseAllTrees();
+	});
+	
+    function toggleModal() {
+        approvalModal.toggleClass('show');
+    }
+    
+    // FancyTree 스크립트 부분
+    
+	$("#search-input").on("keyup", function() {
+		if ($("#search-input").val()) {
+			searchTree();
+		} else {
+			collapseAllTrees();
+		}
+	});
+
+	function collapseAllTrees() {
+		var tree = $.ui.fancytree.getTree("#tree");
+		tree.visit(function(node) {
+			node.setExpanded(false);
+			node.setSelected(false);
+			node.removeClass("search-hi-lite");
+		});
+	}
+
+	function searchTree() {
+		var tree = $.ui.fancytree.getTree("#tree");
+		var searchTerm = $("#search-input").val();
+		tree.filterNodes(searchTerm, {
+			autoExpand : true,
+		});
+		tree.visit(function(node) {
+			if (node.title.includes(searchTerm)) {
+				$(node).addClass("search-hi-lite");
+			} else {
+				$(node).removeClass("search-hi-lite");
+			}
+		});
+	}
+});

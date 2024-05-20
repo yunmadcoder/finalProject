@@ -1,0 +1,77 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!-- import css -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/project/css/layout/aside.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/project/css/admin/aside_admin.css" />
+<!-- import js -->
+<script src="${pageContext.request.contextPath }/resources/project/js/layout/aside.js"></script>
+
+<!-- ---------------------------------- -->
+<!-- 사이드바 메뉴 시작 -->
+<!-- ---------------------------------- -->
+
+<aside class="left-sidebar with-vertical position-fixed">
+	<div class="flex-shrink-0 p-0">
+		<div class="brand-logo d-flex align-items-center">
+			<a href="/" class="text-nowrap logo-img">
+				<img src="${pageContext.request.contextPath}/resources/vendor/images/logos/dark-logo.png" class="logo dark-logo" alt="Logo-Dark" />
+			</a>
+		</div>
+		<div class="d-flex justify-content-center align-items-center mt-2 mb-3">
+			<div class="line"></div>
+		</div>
+		<div class="container">
+
+			<ul class="list-unstyled ps-0">
+				<li>
+					<div class="menu-header">MENU-1</div>
+				</li>
+				<li class="mb-1">
+					<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true" data-menu>Home</button>
+					<div class="collapse show" id="home-collapse" style="">
+						<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" data-list>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Updates</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Reports</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="mb-1">
+					<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="true" data-menu>Dashboard</button>
+					<div class="collapse show" id="dashboard-collapse" style="">
+						<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" data-list>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Weekly</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Monthly</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Annually</a></li>
+						</ul>
+					</div>
+				</li>
+				<li>
+					<div class="menu-header">MENU-2</div>
+				</li>
+				<li class="mb-1">
+					<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="true" data-menu>Orders</button>
+					<div class="collapse show" id="orders-collapse" style="">
+						<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" data-list>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">New</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Processed</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Shipped</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Returned</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="mb-1">
+					<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="true" data-menu>Account</button>
+					<div class="collapse show" id="account-collapse" style="">
+						<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small" data-list>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">New...</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Profile</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Settings</a></li>
+							<li><a href="#" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Sign out</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</aside>

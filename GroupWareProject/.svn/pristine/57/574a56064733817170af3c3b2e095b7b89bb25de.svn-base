@@ -1,0 +1,74 @@
+package kr.or.ddit.groupware.util;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.notification.INotificationService;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.NotificationVO;
+
+@Component
+public class NotificationUtil {
+	
+	@Inject
+	private INotificationService notiService;
+
+	public Map<Integer, SseEmitter> emitterMap = new ConcurrentHashMap<>();
+	public EmployeeVO employeeVO;
+	
+	ObjectMapper mapper = new ObjectMapper();
+	
+	public SseEmitter findEmitterByEmplNo(int emplNo) {
+		return emitterMap.get(emplNo);
+	}
+	
+	@Scheduled(cron = "0 * * * * *")
+	public void run() {
+		if(employeeVO == null) {
+			return;
+		}
+		
+		sendNoti(employeeVO.getEmplNo());
+	}
+	
+	public void sendNoti(int emplNo) {
+		
+		SseEmitter emitter = findEmitterByEmplNo(emplNo);
+		
+		List<NotificationVO> notiList = notiService.selectNotiList(emplNo);
+		try {
+			if (notiList.size() > 0) {
+				for (NotificationVO notificationVO : notiList) {
+					LocalDateTime reservationTime = notificationVO.getLocalDt();
+					LocalDateTime currentTime = LocalDateTime.now();
+
+					if (reservationTime.getYear() == currentTime.getYear()
+							&& reservationTime.getMonth().equals(currentTime.getMonth())
+							&& reservationTime.getDayOfMonth() == currentTime.getDayOfMonth()
+							&& reservationTime.getHour() == currentTime.getHour()
+							&& 
+							(reservationTime.getMinute() == currentTime.getMinute()
+							|| reservationTime.getMinute() == currentTime.getMinute()-1
+							)
+						) 
+					{
+						emitter.send(SseEmitter.event().data(mapper.writeValueAsString(notificationVO)));
+					}
+				}
+			}
+		} catch (Exception e) {
+			emitter.completeWithError(e);
+		}
+	}
+
+}

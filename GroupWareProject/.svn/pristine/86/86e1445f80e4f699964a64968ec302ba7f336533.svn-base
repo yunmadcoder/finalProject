@@ -1,0 +1,25 @@
+package kr.or.ddit.groupware.mapper.notification;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.NotificationVO;
+
+/**
+ * 알림 SQL Mapper
+ * @author 이명문
+ * @version 1.0
+ * @see INotificationMapper
+ */
+public interface INotificationMapper {
+
+	List<NotificationVO> selectNotiList(NotificationVO notiVO);
+
+	List<NotificationVO> selectNotReadNotiList(NotificationVO notiVO);
+
+	List<NotificationVO> selectNotReadNotiFive(NotificationVO notiVO);
+
+	int notiRead(NotificationVO notificationVO);
+
+	int notiDelete(NotificationVO notificationVO);
+
+}

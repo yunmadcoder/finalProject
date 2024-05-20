@@ -1,0 +1,303 @@
+package kr.or.ddit.groupware.controller.common;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.attach.IAttachFileService;
+import kr.or.ddit.groupware.service.employee.IEmployeeService;
+import kr.or.ddit.groupware.service.notification.INotificationService;
+import kr.or.ddit.groupware.service.widget.IWidgetService;
+import kr.or.ddit.groupware.util.FileUtil;
+import kr.or.ddit.groupware.util.News;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.util.TableCode;
+import kr.or.ddit.groupware.vo.AttachFileGroupVO;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeEstbsVO;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.NewsItemVO;
+import kr.or.ddit.groupware.vo.NotificationVO;
+import kr.or.ddit.groupware.vo.WidgetVO;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * 메인 컨트롤러
+ * 
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see MainController
+ */
+@Slf4j
+@Controller
+@RequestMapping("/")
+public class MainController {
+
+	@Inject
+	private FileUtil fileUtil;
+
+	@Inject
+	private IAttachFileService attachFileService;
+
+	@Inject
+	private IWidgetService widgetService;
+
+	@Inject
+	private INotificationService notiService;
+
+	@Inject
+	private IEmployeeService employeeService;
+	
+	private ObjectMapper mapper = new ObjectMapper();
+
+	@PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
+	@GetMapping("")
+	public String testView(Model model) throws Exception {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		List<WidgetVO> widgetList = widgetService.selectWidgetList(employeeVO.getEmplNo());
+
+		if (widgetList != null) {
+			model.addAttribute("widgetList", mapper.writeValueAsString(widgetList));
+			model.addAttribute("employee", employeeVO);
+		}
+
+		/*
+		 * 24.04.19 뉴스 추가 - 이영주
+		 */
+		EmployeeEstbsVO estbsVO = new EmployeeEstbsVO();
+		estbsVO.setEmplNo(employeeVO.getEmplNo()); // 주체
+		estbsVO.setEstbsTypeCode("2"); // 옵션타입코드 - 뉴스
+		estbsVO = employeeService.selectEstbsByEmplNo(estbsVO); // 뉴스키워드 여부 셀렉
+		
+		List<NewsItemVO> newsItems = null;
+		if(estbsVO != null && estbsVO.getEstbsCn() != null) {    // null이 아니고 뉴스 키워드가 있으면
+		    newsItems = News.searchNews(estbsVO.getEstbsCn());
+		} else {    // 없으면
+		    newsItems = new ArrayList<>(); // 빈 리스트 생성
+		}
+		model.addAttribute("newsItems", newsItems);
+		model.addAttribute("selectEstbsValue", estbsVO);
+
+		return "main/main";
+	}
+
+	@GetMapping("/upload")
+	public String upload(Model model) {
+		AttachFileGroupVO attachFileGroupVO = attachFileService.getAttachFileGroup(9);
+		model.addAttribute("attachFileGroup", attachFileGroupVO);
+		return "main/upload";
+	}
+
+	@PostMapping("/upload")
+	public ResponseEntity<Result> uploadPost(List<MultipartFile> files) {
+		fileUtil.saveUploadFile(files, TableCode.BOARD);
+		return ResponseEntity.ok(Result.OK);
+	}
+
+	@GetMapping("/uploadedFiles")
+	public ResponseEntity<String> uploadedFiles() {
+		ObjectMapper mapper = new ObjectMapper();
+		AttachFileGroupVO attachFileGroupVO = attachFileService.getAttachFileGroup(9);
+		String fileData = "";
+		try {
+			fileData = mapper.writeValueAsString(attachFileGroupVO);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
+		return ResponseEntity.ok(fileData);
+	}
+
+	@GetMapping("/download")
+	public ResponseEntity<byte[]> downloadFile(String p) {
+		File file = new File(p);
+		if(file.exists()) {
+			return fileUtil.getFileEntity(p, true);
+		}
+		return null;
+	}
+	
+	@GetMapping("/display")
+	public ResponseEntity<byte[]> displayFile(String p) {
+		File file = new File(p);
+		if(file.exists()) {
+			return fileUtil.getFileEntity(p, false);
+		}
+		return null;
+	}
+
+	@RequestMapping("/calendar")
+	public String calendar() {
+		return "main/calendar";
+	}
+
+	@RequestMapping("/kanban")
+	public String kanban() {
+		return "main/kanban";
+	}
+
+	@RequestMapping("/email")
+	public String email() {
+		return "main/email";
+	}
+
+	@RequestMapping("/addresstable")
+	public String contactTable() {
+		return "main/addressTable";
+	}
+
+	@RequestMapping("/addressbook")
+	public String contactList() {
+		return "main/addressList";
+	}
+
+	@RequestMapping("/profile")
+	public String profile() {
+		return "main/profile";
+	}
+
+	@RequestMapping("/reservation")
+	public String reservation() {
+		return "main/reservation";
+	}
+
+	/**
+	 * @method : notiView
+	 * @auther : <strong>이명문</strong>
+	 * @param : model - 값을 담아 전달해줄 모델
+	 * @param : type - 파라미터 값으로 어떠한 리스트를 가져올지 분기처리
+	 * @return : "main/notification"
+	 * @date : 2024. 4. 15
+	 */
+	@GetMapping("/noti")
+	public String notiView(Model model, String type) {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		NotificationVO notiVO = new NotificationVO();
+		notiVO.setNtcnRecp(customUser.getEmployeeVO().getEmplNo());
+
+		List<NotificationVO> notiList = null;
+		if (type == null || type.equals("all")) {
+			notiList = notiService.selectNotiList(notiVO);
+		}
+		else if (type.equals("unread")) {
+			notiList = notiService.selectNotReadNotiList(notiVO);
+		}
+
+		model.addAttribute("notiList", notiList);
+		model.addAttribute("type", type);
+
+		return "main/notification";
+	}
+	
+	/**
+	 * @method : InsertNewsKeyword 뉴스키워드인서트
+	 * @auther : <strong>이영주</strong>
+	 * @param : 사원번호, 뉴스코드, 키워드
+	 * @return : OK, FAILED
+	 * @date : 2024. 4. 19
+	 *
+	 */
+	@PostMapping("/keywordSetting")
+	public ResponseEntity<String> InsertNewsKeyword(@RequestBody EmployeeEstbsVO estbsVO){
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		
+		estbsVO.setEmplNo(employeeVO.getEmplNo());
+		estbsVO.setEstbsTypeCode("2"); // 옵션타입코드 - 뉴스
+		estbsVO.setEstbsCn(estbsVO.getEstbsCn());
+		estbsVO.setEstbsRegister(employeeVO.getEmplNo());
+		
+		int result = employeeService.insertNewsKeyword(estbsVO);
+		
+		if (result > 0) {
+			return new ResponseEntity<String>("OK", HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<String>("FAILED", HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	/**
+	 * @method : UpdateNewsKeyword 뉴스키워드업데이트
+	 * @auther : <strong>이영주</strong>
+	 * @param : 사원번호, 뉴스코드, 키워드
+	 * @return : OK, FAILED
+	 * @date : 2024. 4. 19
+	 *
+	 */
+	@PostMapping("/keywordUpdate")
+	public ResponseEntity<String> UpdateNewsKeyword(@RequestBody EmployeeEstbsVO estbsVO){
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		EmployeeEstbsVO NewEstbsVO = new EmployeeEstbsVO();
+		NewEstbsVO.setEmplNo(employeeVO.getEmplNo());
+		NewEstbsVO.setEstbsTypeCode("2"); // 옵션타입코드 - 뉴스
+		NewEstbsVO = employeeService.selectEstbsByEmplNo(NewEstbsVO); // 뉴스키워드 여부 셀렉
+		
+		estbsVO.setEstbsNo(NewEstbsVO.getEstbsNo());
+		
+		estbsVO.setEmplNo(employeeVO.getEmplNo());
+		estbsVO.setEstbsCn(estbsVO.getEstbsCn());
+		estbsVO.setEstbsUpdusr(employeeVO.getEmplNo()); //업데이트한 사원번호
+		
+		int result = employeeService.updateNewsKeyword(estbsVO);
+		
+		if (result > 0) {
+			return new ResponseEntity<String>("OK", HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<String>("FAILED", HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	/**
+	 * @method : CreateNewsList 뉴스리스트 다시 불러오는 메서드
+	 * @auther : <strong>이영주</strong>
+	 * @param : 사원번호, 뉴스코드, 키워드
+	 * @return : 바뀐 키워드로 불러온 뉴스리스트
+	 * @date : 2024. 4. 20
+	 *
+	 */
+	@GetMapping(value = "/createNewsList", produces = MediaType.APPLICATION_JSON_VALUE )
+	public ResponseEntity<String> CreateNewsList() throws Exception{
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		
+		EmployeeEstbsVO estbsVO = new EmployeeEstbsVO();
+		estbsVO.setEmplNo(employeeVO.getEmplNo()); // 주체
+		estbsVO.setEstbsTypeCode("2"); // 옵션타입코드 - 뉴스
+		estbsVO = employeeService.selectEstbsByEmplNo(estbsVO); // 뉴스키워드 여부 셀렉
+		
+		List<NewsItemVO> newsItems = null;
+		if(estbsVO != null && estbsVO.getEstbsCn() != null) {    // null이 아니고 뉴스 키워드가 있으면
+		    newsItems = News.searchNews(estbsVO.getEstbsCn());
+		} else {    // 없으면
+		    newsItems = new ArrayList<>(); // 빈 리스트 생성
+		}
+		String newNewsList = mapper.writeValueAsString(newsItems);
+		return new ResponseEntity<String>(newNewsList,HttpStatus.OK);
+	}
+
+}

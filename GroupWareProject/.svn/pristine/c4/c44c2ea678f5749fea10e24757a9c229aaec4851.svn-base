@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.project.IProjectMapper">
+	
+	<select id="selectProjectListByEmplNo" parameterType="int" resultType="projectVO">
+		SELECT
+		    a.prjct_no,
+		    a.prjct_nm,
+		    a.empl_no,
+		    a.prjct_begin_date,
+		    a.prjct_end_date,
+		    a.prjct_code,
+		    a.prjct_cn,
+		    a.prjct_color_code
+		FROM
+		    project a, project_participant b
+		where
+		    a.prjct_no = b.prjct_no
+		    and b.empl_no = #{emplNo}
+	</select>
+	
+	<select id="selectAvailableProjectListByEmplNo" parameterType="int" resultType="projectVO">
+		SELECT
+		    a.prjct_no,
+		    a.prjct_nm,
+		    a.empl_no,
+		    a.prjct_begin_date,
+		    a.prjct_end_date,
+		    a.prjct_code,
+		    a.prjct_cn,
+		    a.prjct_color_code
+		FROM
+		    project a, project_participant b
+		where
+		    a.prjct_no = b.prjct_no
+		    and (a.prjct_code = 'P102' OR a.prjct_code='P101')
+		    and b.empl_no = #{emplNo}
+	</select>
+	
+	<select id="selectProjectParticipant" parameterType="int" resultType="int">
+		SELECT
+		    empl_no
+		FROM
+		    project_participant
+		where
+		    prjct_no = #{projectNo}
+	</select>
+	
+</mapper>

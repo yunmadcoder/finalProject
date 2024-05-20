@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.mail.IMailMapper">
+
+	<sql id="emailSearch">
+		<if test="searchType != null and searchType == 'all'">
+			and (
+		        b.email_nm LIKE '%'||#{searchWord}||'%'
+		        OR c.empl_nm LIKE '%'||#{searchWord}||'%'
+		        OR d.CLSF_NM LIKE '%'||#{searchWord}||'%'
+		        OR e.CMMN_CODE_NAME1 LIKE '%'||#{searchWord}||'%'
+		    	)
+		</if>
+<!-- 		<if test="searchType != null and searchType == 'title'"> -->
+<!-- 			and (bo_title like '%'||#{searchWord}||'%') -->
+<!-- 		</if> -->
+<!-- 		<if test="searchType != null and searchType == 'content'"> -->
+<!-- 			and (bo_writer like '%'||#{searchWord}||'%') -->
+<!-- 		</if> -->
+<!-- 		<if test="searchType != null and searchType == 'fileNm'"> -->
+<!-- 			and (bo_writer like '%'||#{searchWord}||'%') -->
+<!-- 		</if> -->
+	</sql>
+	
+<!-- 	<sql id="emailSearch"> -->
+<!-- 		<if test="searchType != null and searchType == 'all'"> -->
+<!-- 			and ( -->
+<!-- 		        b.email_nm LIKE '%'||#{searchTitle}||'%' -->
+		        
+<!-- 		        and -->
+		        
+<!-- 		        ( -->
+<!-- 		        c.empl_nm LIKE '%'||#{searchSender}||'%' -->
+<!-- 		        OR d.CLSF_NM LIKE '%'||#{searchSender}||'%' -->
+<!-- 		        OR e.CMMN_CODE_NAME1 LIKE '%'||#{searchSender}||'%' -->
+<!-- 		        ) -->
+		        
+<!-- 		        and -->
+		        
+<!-- 		    	) -->
+<!-- 		</if> -->
+<!-- 	</sql> -->
+	
+	
+	<resultMap type="emailVO" id="emailMap">
+		<id property="emailNo" column="email_no" />
+		<result property="emailNo" column="email_no" />
+		<result property="senderNo" column="sender_no" />
+		<result property="emailNm" column="email_nm" />
+		<result property="emailCn" column="email_cn" />
+		<result property="emailImprtncYn" column="email_imprtnc_yn" />
+		<result property="emailDelYn" column="email_del_yn" />
+		<result property="emailStatusCode" column="email_status_code" />
+		<result property="emailRgdde" column="email_rgdde" />
+		<result property="emailTrnsmis" column="email_trnsmis" />
+		<result property="atchFileGroupNo" column="atch_file_group_no" />
+		<association property="emailReceptionVO" resultMap="emailReceptionMap"/>
+		<association property="employeeVO" resultMap="employeeMap"/>
+	</resultMap>
+	
+	<resultMap type="emailReceptionVO" id="emailReceptionMap">
+		<id property="emailNo" column="email_no" />
+		<result property="receiverNo" column="receiver_no" />
+		<result property="emailNo" column="email_no" />
+		<result property="emailRecptnReadYn" column="email_recptn_read_yn" />
+		<result property="emailRecptnImprtncYn" column="email_recptn_imprtnc_yn" />
+		<result property="emailRecptnRecpTypeCode" column="email_recptn_recp_type_code" />
+		<result property="emailRecptnDelYn" column="email_recptn_del_yn" />
+	</resultMap>
+
+	<resultMap type="employeeVO" id="employeeMap">
+		<id property="emplNo" column="EMPL_NO"/>
+		<result property="emplNo" column="EMPL_NO"/>
+		<result property="clsfCode" column="CLSF_CODE"/>
+		<result property="deptCode" column="DEPT_CODE"/>
+		<result property="emplNm" column="EMPL_NM"/>
+		<result property="emplId" column="EMPL_ID"/>
+		<result property="emplPassword" column="EMPL_PASSWORD"/>
+		<result property="emplZip" column="EMPL_ZIP"/>
+		<result property="emplAdres" column="EMPL_ADRES"/>
+		<result property="emplAdres2" column="EMPL_ADRES2"/>
+		<result property="emplEmail" column="EMPL_EMAIL"/>
+		<result property="emplTelno" column="EMPL_TELNO"/>
+		<result property="emplIhidnum" column="EMPL_IHIDNUM"/>
+		<result property="emplProflPhoto" column="EMPL_PROFL_PHOTO"/>
+		<result property="emplSign" column="EMPL_SIGN"/>
+		<result property="enabled" column="ENABLED"/>
+		<result property="emplEncpn" column="EMPL_ENCPN"/>
+		<result property="rgsde" column="RGSDE"/>
+		<result property="register" column="REGISTER"/>
+		<result property="updde" column="UPDDE"/>
+		<result property="updusr" column="UPDUSR"/>
+		<collection property="classOfPositionVO" resultMap="classOfPositionMap"/>
+	</resultMap>
+	
+	<resultMap type="classOfPositionVO" id="classOfPositionMap">
+		<id property="clsfCode" column="CLSF_CODE"/>
+		<result property="clsfCode" column="CLSF_CODE"/>
+		<result property="clsfNm" column="CLSF_NM"/>
+		<result property="clsfLevel" column="CLSF_LEVEL"/>
+		<result property="useYn" column="USE_YN"/>
+		<result property="rgsde" column="RGSDE"/>
+		<result property="register" column="REGISTER"/>
+		<result property="updde" column="UPDDE"/>
+		<result property="updusr" column="UPDUSR"/>
+	</resultMap>
+	
+	<!-- 받은메일함 시작 -->
+
+	<!-- 받은메일함 목록 출력 페이징X -->
+	<select id="selectEmailList2" parameterType="int" resultMap="emailMap">
+		SELECT
+			a.empl_no as receiver_no,
+		    a.email_no,
+		    a.email_recptn_read_yn,
+		    a.email_recptn_imprtnc_yn,
+		    a.email_recptn_recp_type_code,
+		    a.email_recptn_del_yn,
+		    b.empl_no as sender_no,
+		    b.email_nm,
+		    b.email_cn,
+		    b.email_imprtnc_yn,
+		    b.email_del_yn,
+		    b.email_status_code,
+		    b.email_rgdde,
+		    b.email_trnsmis
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.email_recptn_del_yn = 'N'
+		AND b.email_status_code = 'E101'
+		AND b.empl_no != #{emplNo}
+	</select>
+	
+	<!-- 받은메일함 목록 출력 -->
+	<select id="selectEmailList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					a.empl_no as receiver_no,
+				    a.email_no,
+				    a.email_recptn_read_yn,
+				    a.email_recptn_imprtnc_yn,
+				    a.email_recptn_recp_type_code,
+				    a.email_recptn_del_yn,
+				    b.empl_no as sender_no,
+				    b.email_nm,
+				    b.email_cn,
+				    b.email_imprtnc_yn,
+				    b.email_del_yn,
+				    b.email_status_code,
+				    b.email_rgdde,
+				    b.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email_Reception a
+				INNER JOIN
+				    email b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_recptn_del_yn = 'N'
+				AND b.email_status_code = 'E101'
+				AND b.empl_no != #{emplNo}
+				<include refid="emailSearch"/>
+				order by b.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 받은메일함 전체 카운트 -->
+	<select id="selectEmailCount" parameterType="pagingVO" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.email_recptn_del_yn = 'N'
+		AND b.email_status_code = 'E101'
+		AND b.empl_no != #{emplNo}
+	</select>
+	
+	<!-- 받은메일함 안읽은 메일 카운트 -->
+	<select id="selectNoReadCount" parameterType="int" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.email_recptn_del_yn = 'N'
+		AND b.email_status_code = 'E101'
+		AND b.empl_no != #{emplNo}
+		AND a.email_recptn_read_yn = 'N'
+	</select>
+	
+	<!-- 메일상세 -->
+	<select id="selectEmail" parameterType="int" resultMap="emailMap">
+		SELECT
+			a.empl_no as receiver_no,
+		    a.email_no,
+		    a.email_recptn_read_yn,
+		    a.email_recptn_imprtnc_yn,
+		    a.email_recptn_recp_type_code,
+		    a.email_recptn_del_yn,
+		    b.empl_no as sender_no,
+		    b.email_nm,
+		    b.email_cn,
+		    b.email_imprtnc_yn,
+		    b.email_del_yn,
+		    b.email_status_code,
+		    b.email_rgdde,
+		    b.email_trnsmis,
+		    b.ATCH_FILE_GROUP_NO
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.email_no = #{emailNo}
+	</select>
+	
+	<select id="selectReceptionList" parameterType="int" resultMap="emailReceptionMap">
+		SELECT
+			empl_no as receiver_no,
+		    email_no,
+		    email_recptn_read_yn,
+		    email_recptn_imprtnc_yn,
+		    email_recptn_recp_type_code,
+		    email_recptn_del_yn
+		FROM
+		    email_Reception
+		WHERE email_no = #{emailNo}
+	</select>
+	
+	<!-- 발신자가 메일 삭제 -->
+	<update id="deleteEmail">
+		UPDATE
+			email
+		SET
+			email_del_yn = 'Y'
+		WHERE email_no = #{emailNo}
+	</update>
+	
+	<!-- 수신자가 메일 삭제 -->
+	<update id="deleteReception">
+		UPDATE
+			email_Reception
+		SET
+			email_recptn_del_yn = 'Y'
+		WHERE email_no = #{emailNo}
+	</update>
+	
+	<!-- 메일 읽음처리 -->
+	<update id="readEmail">
+		UPDATE
+			email_Reception
+		SET
+			email_recptn_read_yn = 'Y'
+		WHERE email_no = #{emailNo}
+	</update>
+	
+	<!-- 발신자가 메일 중요표시-->
+	<update id="importantEmail">
+		UPDATE
+			email
+		SET
+			EMAIL_IMPRTNC_YN = 'Y'
+		WHERE email_no = #{emailNo}
+	</update>
+	
+	<!-- 수신자가 메일 중요표시 -->
+	<update id="importantReception">
+		UPDATE
+			email_Reception
+		SET
+			EMAIL_RECPTN_IMPRTNC_YN = 'Y'
+		WHERE email_no = #{emailNo}
+	</update>
+	
+	<!-- 보낸메일함 시작 -->
+	
+	<sql id="sentSearch">
+		<if test="searchType != null and searchType == 'all'">
+			and (
+		        a.email_nm LIKE '%'||#{searchWord}||'%'
+		        OR c.empl_nm LIKE '%'||#{searchWord}||'%'
+		        OR d.CLSF_NM LIKE '%'||#{searchWord}||'%'
+		        OR e.CMMN_CODE_NAME1 LIKE '%'||#{searchWord}||'%'
+		    	)
+		</if>
+	</sql>
+	
+	<!-- 보낸메일함 목록 출력 -->
+	<select id="selectSentList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					b.empl_no as receiver_no,
+				    b.email_no,
+				    b.email_recptn_read_yn,
+				    b.email_recptn_imprtnc_yn,
+				    b.email_recptn_recp_type_code,
+				    b.email_recptn_del_yn,
+				    a.empl_no as sender_no,
+				    a.email_nm,
+				    a.email_cn,
+				    a.email_imprtnc_yn,
+				    a.email_del_yn,
+				    a.email_status_code,
+				    a.email_rgdde,
+				    a.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email a
+				INNER JOIN
+				    email_Reception b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_del_yn = 'N'
+				AND a.email_status_code = 'E101'
+				AND b.empl_no != #{emplNo}
+				<include refid="sentSearch"/>
+				order by a.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 보낸메일함 전체 카운트 -->
+	<select id="selectSentCount" parameterType="pagingVO" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email a
+		INNER JOIN
+		    email_Reception b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.EMAIL_DEL_YN = 'N'
+		AND a.email_status_code = 'E101'
+		AND b.empl_no != #{emplNo}
+	</select>
+	
+	<!-- 안읽은메일함 목록 출력 -->
+	<select id="selectNoReadList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					a.empl_no as receiver_no,
+				    a.email_no,
+				    a.email_recptn_read_yn,
+				    a.email_recptn_imprtnc_yn,
+				    a.email_recptn_recp_type_code,
+				    a.email_recptn_del_yn,
+				    b.empl_no as sender_no,
+				    b.email_nm,
+				    b.email_cn,
+				    b.email_imprtnc_yn,
+				    b.email_del_yn,
+				    b.email_status_code,
+				    b.email_rgdde,
+				    b.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email_Reception a
+				INNER JOIN
+				    email b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_recptn_del_yn = 'N'
+				AND b.email_status_code = 'E101'
+				AND b.empl_no != #{emplNo}
+				AND a.EMAIL_RECPTN_READ_YN = 'N'
+				<include refid="emailSearch"/>
+				order by b.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 중요메일함 목록 출력 -->
+	<select id="selectImportantList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				    SELECT
+					    receiver_no,
+					    email_no,
+					    email_recptn_read_yn,
+					    email_recptn_imprtnc_yn,
+					    email_recptn_recp_type_code,
+					    email_recptn_del_yn,
+					    sender_no,
+					    email_nm,
+					    email_cn,
+					    email_imprtnc_yn,
+					    email_del_yn,
+					    email_status_code,
+					    email_rgdde,
+					    email_trnsmis,
+					    empl_nm,
+					    CLSF_NM,
+					    DEPT_CODE
+					FROM (
+					    SELECT
+					        b.empl_no AS receiver_no,
+					        b.email_no,
+					        b.email_recptn_read_yn,
+					        b.email_recptn_imprtnc_yn,
+					        b.email_recptn_recp_type_code,
+					        b.email_recptn_del_yn,
+					        a.empl_no AS sender_no,
+					        a.email_nm,
+					        a.email_cn,
+					        a.email_imprtnc_yn,
+					        a.email_del_yn,
+					        a.email_status_code,
+					        a.email_rgdde,
+					        a.email_trnsmis,
+					        c.empl_nm,
+					        d.CLSF_NM,
+					        e.CMMN_CODE_NAME1 AS DEPT_CODE
+					    FROM
+					        email a
+					    INNER JOIN
+					        email_Reception b ON a.email_no = b.email_no
+					    INNER JOIN
+					        employee c ON b.empl_no = c.empl_no
+					    INNER JOIN 
+					        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+					    INNER JOIN 
+					        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+					    WHERE a.empl_no = 1
+					        AND a.email_del_yn = 'N'
+					        AND a.email_status_code = 'E101'
+					        AND a.email_imprtnc_yn = 'Y'
+					        <include refid="sentSearch"/>
+					
+					    UNION ALL
+					
+					    SELECT
+					        a.empl_no AS receiver_no,
+					        a.email_no,
+					        a.email_recptn_read_yn,
+					        a.email_recptn_imprtnc_yn,
+					        a.email_recptn_recp_type_code,
+					        a.email_recptn_del_yn,
+					        b.empl_no AS sender_no,
+					        b.email_nm,
+					        b.email_cn,
+					        b.email_imprtnc_yn,
+					        b.email_del_yn,
+					        b.email_status_code,
+					        b.email_rgdde,
+					        b.email_trnsmis,
+					        c.empl_nm,
+					        d.CLSF_NM,
+					        e.CMMN_CODE_NAME1 AS DEPT_CODE
+					    FROM
+					        email_Reception a
+					    INNER JOIN
+					        email b ON a.email_no = b.email_no
+					    INNER JOIN
+					        employee c ON b.empl_no = c.empl_no
+					    INNER JOIN 
+					        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+					    INNER JOIN 
+					        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+					    WHERE a.empl_no = 1
+					        AND a.email_recptn_del_yn = 'N'
+					        AND b.email_status_code = 'E101'
+					        AND a.email_recptn_imprtnc_yn = 'Y'
+									<include refid="emailSearch"/>
+					)
+					ORDER BY email_rgdde DESC
+				) a
+			) b
+			<![CDATA[
+			where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+			]]>
+	</select>
+	
+	<!-- 중요메일함 전체 카운트 -->
+	<select id="selectImportantCount" parameterType="pagingVO" resultType="int">
+		SELECT COUNT(*)
+			FROM (
+			    SELECT
+			        b.empl_no AS receiver_no,
+			        b.email_no,
+			        b.email_recptn_read_yn,
+			        b.email_recptn_imprtnc_yn,
+			        b.email_recptn_recp_type_code,
+			        b.email_recptn_del_yn,
+			        a.empl_no AS sender_no,
+			        a.email_nm,
+			        a.email_cn,
+			        a.email_imprtnc_yn,
+			        a.email_del_yn,
+			        a.email_status_code,
+			        a.email_rgdde,
+			        a.email_trnsmis,
+			        c.empl_nm,
+			        d.CLSF_NM,
+			        e.CMMN_CODE_NAME1 AS DEPT_CODE
+			    FROM
+			        email a
+			    INNER JOIN
+			        email_Reception b ON a.email_no = b.email_no
+			    INNER JOIN
+			        employee c ON b.empl_no = c.empl_no
+			    INNER JOIN 
+			        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+			    INNER JOIN 
+			        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+			    WHERE a.empl_no = 1
+			        AND a.email_del_yn = 'N'
+			        AND a.email_status_code = 'E101'
+			        AND a.email_imprtnc_yn = 'Y'
+			
+			    UNION ALL
+			
+			    SELECT
+			        a.empl_no AS receiver_no,
+			        a.email_no,
+			        a.email_recptn_read_yn,
+			        a.email_recptn_imprtnc_yn,
+			        a.email_recptn_recp_type_code,
+			        a.email_recptn_del_yn,
+			        b.empl_no AS sender_no,
+			        b.email_nm,
+			        b.email_cn,
+			        b.email_imprtnc_yn,
+			        b.email_del_yn,
+			        b.email_status_code,
+			        b.email_rgdde,
+			        b.email_trnsmis,
+			        c.empl_nm,
+			        d.CLSF_NM,
+			        e.CMMN_CODE_NAME1 AS DEPT_CODE
+			    FROM
+			        email_Reception a
+			    INNER JOIN
+			        email b ON a.email_no = b.email_no
+			    INNER JOIN
+			        employee c ON b.empl_no = c.empl_no
+			    INNER JOIN 
+			        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+			    INNER JOIN 
+			        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+			    WHERE a.empl_no = 1
+			        AND a.email_recptn_del_yn = 'N'
+			        AND b.email_status_code = 'E101'
+			        AND a.email_recptn_imprtnc_yn = 'Y'
+			)
+	</select>
+	
+	<!-- 중요메일함 안읽은 메일 카운트 -->
+	<select id="selectImportantNoReadCount" parameterType="int" resultType="int">
+		SELECT COUNT(*)
+			FROM (
+			    SELECT
+			        b.empl_no AS receiver_no,
+			        b.email_no,
+			        b.email_recptn_read_yn,
+			        b.email_recptn_imprtnc_yn,
+			        b.email_recptn_recp_type_code,
+			        b.email_recptn_del_yn,
+			        a.empl_no AS sender_no,
+			        a.email_nm,
+			        a.email_cn,
+			        a.email_imprtnc_yn,
+			        a.email_del_yn,
+			        a.email_status_code,
+			        a.email_rgdde,
+			        a.email_trnsmis,
+			        c.empl_nm,
+			        d.CLSF_NM,
+			        e.CMMN_CODE_NAME1 AS DEPT_CODE
+			    FROM
+			        email a
+			    INNER JOIN
+			        email_Reception b ON a.email_no = b.email_no
+			    INNER JOIN
+			        employee c ON b.empl_no = c.empl_no
+			    INNER JOIN 
+			        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+			    INNER JOIN 
+			        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+			    WHERE a.empl_no = 1
+			        AND a.email_del_yn = 'N'
+			        AND a.email_status_code = 'E101'
+			        AND a.email_imprtnc_yn = 'Y'
+			
+			    UNION ALL
+			
+			    SELECT
+			        a.empl_no AS receiver_no,
+			        a.email_no,
+			        a.email_recptn_read_yn,
+			        a.email_recptn_imprtnc_yn,
+			        a.email_recptn_recp_type_code,
+			        a.email_recptn_del_yn,
+			        b.empl_no AS sender_no,
+			        b.email_nm,
+			        b.email_cn,
+			        b.email_imprtnc_yn,
+			        b.email_del_yn,
+			        b.email_status_code,
+			        b.email_rgdde,
+			        b.email_trnsmis,
+			        c.empl_nm,
+			        d.CLSF_NM,
+			        e.CMMN_CODE_NAME1 AS DEPT_CODE
+			    FROM
+			        email_Reception a
+			    INNER JOIN
+			        email b ON a.email_no = b.email_no
+			    INNER JOIN
+			        employee c ON b.empl_no = c.empl_no
+			    INNER JOIN 
+			        CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+			    INNER JOIN 
+			        COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+			    WHERE a.empl_no = 1
+			        AND a.email_recptn_del_yn = 'N'
+			        AND b.email_status_code = 'E101'
+			        AND a.email_recptn_imprtnc_yn = 'Y'
+			        AND a.email_recptn_read_yn = 'N'
+			)
+	</select>
+	
+	<!-- 내게쓴메일함 목록 출력 -->
+	<select id="selectToMeList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					a.empl_no as receiver_no,
+				    a.email_no,
+				    a.email_recptn_read_yn,
+				    a.email_recptn_imprtnc_yn,
+				    a.email_recptn_recp_type_code,
+				    a.email_recptn_del_yn,
+				    b.empl_no as sender_no,
+				    b.email_nm,
+				    b.email_cn,
+				    b.email_imprtnc_yn,
+				    b.email_del_yn,
+				    b.email_status_code,
+				    b.email_rgdde,
+				    b.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email_Reception a
+				INNER JOIN
+				    email b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_recptn_del_yn = 'N'
+				AND b.email_status_code = 'E101'
+				AND b.empl_no = #{emplNo}
+				<include refid="emailSearch"/>
+				order by b.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 내게쓴메일함 전체 카운트 -->
+	<select id="selectToMeCount" parameterType="pagingVO" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.email_recptn_del_yn = 'N'
+		AND b.email_status_code = 'E101'
+		AND b.empl_no = #{emplNo}
+	</select>
+	
+	<!-- 내게쓴메일함 안읽은 메일 카운트 -->
+	<select id="selectToMeNoReadCount" parameterType="int" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email_Reception a
+		INNER JOIN
+		    email b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.email_recptn_del_yn = 'N'
+		AND b.email_status_code = 'E101'
+		AND b.empl_no = #{emplNo}
+		AND a.email_recptn_read_yn = 'N'
+	</select>
+	
+	<!-- 예약메일함 목록 출력 -->
+	<select id="selectReservationList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					b.empl_no as receiver_no,
+				    b.email_no,
+				    b.email_recptn_read_yn,
+				    b.email_recptn_imprtnc_yn,
+				    b.email_recptn_recp_type_code,
+				    b.email_recptn_del_yn,
+				    a.empl_no as sender_no,
+				    a.email_nm,
+				    a.email_cn,
+				    a.email_imprtnc_yn,
+				    a.email_del_yn,
+				    a.email_status_code,
+				    a.email_rgdde,
+				    a.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email a
+				INNER JOIN
+				    email_Reception b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_del_yn = 'N'
+				AND a.email_status_code = 'E102'
+				AND b.empl_no != #{emplNo}
+				<include refid="sentSearch"/>
+				order by a.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 예약메일함 전체 카운트 -->
+	<select id="selectReservationCount" parameterType="pagingVO" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email a
+		INNER JOIN
+		    email_Reception b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.EMAIL_DEL_YN = 'N'
+		AND a.email_status_code = 'E102'
+		AND b.empl_no != #{emplNo}
+	</select>
+	
+	<!-- 임시보관함 목록 출력 -->
+	<select id="selectDraftList" parameterType="pagingVO" resultMap="emailMap">
+		select
+			b.*
+		from(
+			select	
+				a.*, row_number() over (order by a.email_no desc) rnum
+			from(
+				SELECT
+					b.empl_no as receiver_no,
+				    b.email_no,
+				    b.email_recptn_read_yn,
+				    b.email_recptn_imprtnc_yn,
+				    b.email_recptn_recp_type_code,
+				    b.email_recptn_del_yn,
+				    a.empl_no as sender_no,
+				    a.email_nm,
+				    a.email_cn,
+				    a.email_imprtnc_yn,
+				    a.email_del_yn,
+				    a.email_status_code,
+				    a.email_rgdde,
+				    a.email_trnsmis,
+				    c.empl_nm, d.CLSF_NM, e.CMMN_CODE_NAME1 as DEPT_CODE
+				FROM
+				    email a
+				INNER JOIN
+				    email_Reception b ON a.email_no = b.email_no
+				INNER JOIN
+				    employee c ON b.empl_no = c.empl_no
+				INNER JOIN 
+		    		CLASS_OF_POSITION d ON c.CLSF_CODE = d.CLSF_CODE
+				INNER JOIN 
+		    		COMM_CODE e ON c.DEPT_CODE = e.CMMN_CODE
+				WHERE a.empl_no = #{emplNo}
+				AND a.email_del_yn = 'N'
+				AND a.email_status_code = 'E103'
+				<include refid="sentSearch"/>
+				order by a.email_rgdde desc
+			) a
+		) b
+		<![CDATA[
+		where b.rnum >= #{startRow} and b.rnum <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 임시보관함 전체 카운트 -->
+	<select id="selectDraftCount" parameterType="pagingVO" resultType="int">
+		SELECT
+			count(a.email_no)
+		FROM
+		    email a
+		INNER JOIN
+		    email_Reception b ON a.email_no = b.email_no
+		WHERE a.empl_no = #{emplNo}
+		AND a.EMAIL_DEL_YN = 'N'
+		AND a.email_status_code = 'E103'
+	</select>
+	
+	<!-- email테이블 insert -->
+	<insert id="insertEmail" parameterType="emailVO" useGeneratedKeys="true">
+		<selectKey keyProperty="emailNo" resultType="int" order="BEFORE">
+			select seq_email.nextval from dual
+		</selectKey>
+		INSERT INTO email (
+		    email_no
+		    , empl_no
+		    , email_nm
+		    , email_cn
+		    , email_imprtnc_yn
+		    , email_del_yn
+		    , email_status_code
+		    , email_rgdde
+		    , email_trnsmis
+		    , ATCH_FILE_GROUP_NO
+		) VALUES (
+		    #{emailNo}
+		  , #{emplNo}
+		  , #{emailNm}
+		  , #{emailCn}
+		  , 'N'
+		  , 'N'
+		  , #{emailStatusCode}
+		  , sysdate
+		  <choose>
+		  	<when test="emailStatusCode == 'E102'">
+		  , #{emailTrnsmis}
+		  	</when>
+		  	<otherwise>
+		  , sysdate
+		  	</otherwise>
+		  </choose>
+		  , #{atchFileGroupNo}
+		)
+	</insert>
+	
+	<!-- emailReception테이블 insert -->
+	<insert id="insertReception" parameterType="emailReceptionVO">
+		INSERT INTO email_reception (
+		    empl_no
+		    , email_no
+		    , email_recptn_read_yn
+		    , email_recptn_imprtnc_yn
+		    , email_recptn_recp_type_code
+		    , email_recptn_del_yn
+		) VALUES (
+		    #{emplNo}
+		  , #{emailNo}
+		  , 'N'
+		  , 'N'
+		  , #{emailRecptnRecpTypeCode}
+		  , 'N'
+		)
+	</insert>
+	
+	<update id="updateEmail" parameterType="emailVO">
+	UPDATE email
+	SET
+	    email_nm = #{emailNm}
+	    ,email_cn = #{emailNm}
+	    ,email_imprtnc_yn = 'N'
+	    ,email_status_code = 'E101'
+	    ,email_rgdde = sysdate
+	    ,email_trnsmis = sysdate
+	    ,atch_file_group_no = #{atchFileGroupNo}
+	WHERE
+	    email_no = #{emailNo}
+	</update>
+	
+	<delete id="deleteReceptionList">
+	DELETE FROM email_reception
+	WHERE
+	    email_no = #{emailNo}
+	</delete>
+	
+</mapper>

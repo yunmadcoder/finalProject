@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.groupware.mapper.answer.IAnswerMapper">
+
+	<insert id="insertAnswer" parameterType="answerVO" useGeneratedKeys="true">
+	<selectKey keyProperty="answerNo" resultType="int" order="BEFORE">
+		select seq_answer_no.nextval from dual
+	</selectKey>
+		INSERT INTO answer (
+		    answer_no
+		    , upper_answer_no
+		    , empl_no
+		    , bbsctt_no
+		    , answer_dp
+		    , reply_cn
+		    , del_yn
+		    , answer_rgsde
+		    , answer_updde
+		) VALUES (
+		  	#{answerNo}
+		  , #{upperAnswerNo}
+		  , #{emplNo}
+		  , #{bbscttNo}
+		  , #{answerDp}
+		  , #{replyCn}
+		  , #{delYn}
+		  , sysdate
+		  , sysdate
+		)
+	</insert>
+</mapper>

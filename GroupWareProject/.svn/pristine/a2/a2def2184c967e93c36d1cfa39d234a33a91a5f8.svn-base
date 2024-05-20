@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.reservation.IReservationMapper">
+<!-- 	<insert id="addRoomReserv" parameterType="mtgRoomVO"> -->
+<!-- 		<selectKey keyProperty="resveNo" resultType="int" order="BEFORE"> -->
+<!-- 			select seq_reservation.nextval from dual -->
+<!-- 		</selectKey> -->
+		
+<!-- 	      INSERT INTO RESERVATION ( -->
+<!-- 	            RESVE_NO,  -->
+<!-- 	            EMPL_NO,    -->
+<!-- 	            MTNG_ROOM_NO,  -->
+<!-- 	            RESVE_RGSDE,  -->
+<!-- 	            RESVE_BEGIN_DT, -->
+<!-- 	            RESVE_END_DT, -->
+<!-- 	            RESVE_CN, -->
+<!-- 	            RESOURCE_TYPE -->
+<!-- 	        ) VALUES ( -->
+<!-- 	            #{resveNo},   -->
+<!-- 	            #{emplNo}, -->
+<!-- 	            #{mtngRoomNo}, -->
+<!-- 	            SYSDATE, -->
+<!-- 	            #{resveBeginDt, jdbcType=VARCHAR}, -->
+<!-- 	            #{resveEndDt, jdbcType=VARCHAR}, -->
+<!-- 	            #{resveCn}, -->
+<!-- 	            #{resourceType} -->
+<!-- 	        ) -->
+<!-- 	   </insert> -->
+	   
+<!-- 	    <select id="findReservationsByResourceType" parameterType="map" resultType="mtgRoomVO"> -->
+<!--         SELECT -->
+<!--             RESVE_NO, -->
+<!--             EMPL_NO, -->
+<!--             MTNG_ROOM_NO, -->
+<!--             TO_CHAR(RESVE_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') AS RESVE_BEGIN_DT, -->
+<!--             TO_CHAR(RESVE_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS RESVE_END_DT, -->
+<!--             RESVE_CN, -->
+<!--             RESOURCE_TYPE -->
+<!--         FROM -->
+<!--             RESERVATION -->
+<!--         WHERE -->
+<!--         RESOURCE_TYPE = #{resourceType} -->
+<!--     </select> -->
+	   
+	   
+</mapper>

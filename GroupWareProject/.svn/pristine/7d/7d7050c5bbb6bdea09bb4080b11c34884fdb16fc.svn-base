@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.employee.IEmployeeMapper">
+
+	<resultMap type="employeeVO" id="employeeMap">
+		<id property="emplNo" column="EMPL_NO"/>
+		<result property="emplNo" column="EMPL_NO"/>
+		<result property="clsfCode" column="CLSF_CODE"/>
+		<result property="deptCode" column="DEPT_CODE"/>
+		<result property="deptNm" column="DEPT_NM"/>
+		<result property="emplNm" column="EMPL_NM"/>
+		<result property="emplId" column="EMPL_ID"/>
+		<result property="emplPassword" column="EMPL_PASSWORD"/>
+		<result property="emplZip" column="EMPL_ZIP"/>
+		<result property="emplAdres" column="EMPL_ADRES"/>
+		<result property="emplAdres2" column="EMPL_ADRES2"/>
+		<result property="emplEmail" column="EMPL_EMAIL"/>
+		<result property="emplTelno" column="EMPL_TELNO"/>
+		<result property="emplIhidnum" column="EMPL_IHIDNUM"/>
+		<result property="emplProflPhoto" column="EMPL_PROFL_PHOTO"/>
+		<result property="emplSign" column="EMPL_SIGN"/>
+		<result property="enabled" column="ENABLED"/>
+		<result property="emplEncpn" column="EMPL_ENCPN"/>
+		<result property="rgsde" column="RGSDE"/>
+		<result property="register" column="REGISTER"/>
+		<result property="updde" column="UPDDE"/>
+		<result property="updusr" column="UPDUSR"/>
+		<collection property="classOfPositionVO" resultMap="classOfPositionMap"/>
+	</resultMap>
+	
+	<resultMap type="classOfPositionVO" id="classOfPositionMap">
+		<id property="clsfCode" column="CLSF_CODE"/>
+		<result property="clsfCode" column="CLSF_CODE"/>
+		<result property="clsfNm" column="CLSF_NM"/>
+		<result property="clsfLevel" column="CLSF_LEVEL"/>
+		<result property="useYn" column="USE_YN"/>
+		<result property="rgsde" column="RGSDE"/>
+		<result property="register" column="REGISTER"/>
+		<result property="updde" column="UPDDE"/>
+		<result property="updusr" column="UPDUSR"/>
+	</resultMap>
+	
+	<select id="selectEmployee" parameterType="int" resultMap="employeeMap">
+		SELECT
+   			a.EMPL_NO,
+   			a.clsf_code,
+   			b.CLSF_NM,
+   			c.CMMN_CODE as DEPT_CODE,
+   			c.CMMN_CODE_NAME1 as DEPT_NM,
+   			EMPL_NM, EMPL_ID,
+   			EMPL_PASSWORD,
+   			EMPL_ZIP,
+   			EMPL_ADRES,
+   			EMPL_ADRES2,
+   			EMPL_EMAIL,
+   			EMPL_TELNO,
+   			EMPL_IHIDNUM,
+   			EMPL_PROFL_PHOTO,
+   			EMPL_SIGN,
+   			a.ENABLED,
+   			EMPL_ENCPN,
+   			a.RGSDE,
+   			a.REGISTER,
+   			a.UPDDE,
+   			a.UPDUSR
+		FROM 
+		    EMPLOYEE a
+		INNER JOIN 
+		    CLASS_OF_POSITION b ON a.CLSF_CODE = b.CLSF_CODE
+		INNER JOIN 
+		    COMM_CODE c ON a.DEPT_CODE = c.CMMN_CODE
+		WHERE
+		    a.EMPL_NO = #{emplNo}
+	</select>
+	
+	<select id="pwCheck" parameterType="employeeVO" resultType="int">
+		SELECT
+			COUNT(EMPL_NO)
+		FROM
+			EMPLOYEE
+		WHERE
+			EMPL_NO = #{emplNo} and EMPL_PASSWORD = #{emplPassword}
+	</select>
+	
+	<update id="updateEmployee" parameterType="employeeVO">
+		UPDATE
+			EMPLOYEE
+		SET 
+		    EMPL_ZIP = #{emplZip},
+		    EMPL_ADRES = #{emplAdres},
+		    EMPL_ADRES2 = #{emplAdres2},
+		    EMPL_EMAIL = #{emplEmail},
+		    <if test="emplProflPhoto != null and emplProflPhoto != ''">
+		    	EMPL_PROFL_PHOTO = #{emplProflPhoto},
+			</if>
+		    EMPL_TELNO = #{emplTelno},
+		    UPDDE = sysdate,
+		    UPDUSR = #{emplNo}
+		WHERE
+			empl_no = #{emplNo}
+	</update>
+	
+	<!-- DEPT_CODE = DEPT_CODE -->
+	<select id="selectAllEmpl" resultType="employeeVO">
+		SELECT
+		    a.empl_no,
+		    a.clsf_code,
+		    b.clsf_nm,
+		    a.dept_code,
+		    a.empl_nm,
+		    a.empl_id,
+		    a.empl_email,
+		    a.empl_telno,
+		    a.EMPL_PROFL_PHOTO
+		FROM
+		    employee a, class_of_position b
+		where
+		    enabled= '1' and a.clsf_code = b.clsf_code
+		order by a.clsf_code desc
+	</select>
+	
+	<!-- DEPT_CODE = 팀명(CMMN_CODE_NAME1) -->
+	<select id="selectAllEmpl2" resultType="employeeVO">
+		SELECT
+		    a.empl_no,
+		    a.clsf_code,
+		    b.clsf_nm,
+		    c.CMMN_CODE_NAME1 as DEPT_CODE,
+		    a.empl_nm,
+		    a.empl_id,
+		    a.empl_email,
+		    a.empl_telno,
+		    a.EMPL_PROFL_PHOTO
+		FROM
+		    employee a, class_of_position b, COMM_CODE c
+		where
+		    enabled= '1' and a.clsf_code = b.clsf_code and a.DEPT_CODE = c.CMMN_CODE
+		ORDER BY
+		    a.DEPT_CODE ASC,
+		    a.clsf_code DESC
+	</select>
+	
+	<select id="selectDeptEmpl" parameterType="string" resultType="employeeVO">
+		SELECT
+		    a.empl_no,
+		    a.clsf_code,
+		    b.clsf_nm,
+		    a.dept_code,
+		    a.empl_nm,
+		    a.empl_id,
+		    a.empl_email,
+		    a.empl_telno,
+		    a.EMPL_PROFL_PHOTO
+		FROM
+		    employee a, class_of_position b
+		where
+		    enabled= '1' and a.clsf_code = b.clsf_code
+		    and a.dept_code = #{deptCode}
+		order by a.clsf_code desc
+	</select>
+	
+	<select id="selectEstbsByEmplNo" parameterType="employeeEstbsVO" resultType="employeeEstbsVO">
+		select 
+			estbs_no
+			, empl_no
+			, estbs_type_code
+			, estbs_cn
+		from employee_estbs
+		where empl_no = #{emplNo}
+		and estbs_type_code = #{estbsTypeCode}	
+	</select>
+	
+</mapper>

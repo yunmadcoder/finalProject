@@ -1,0 +1,36 @@
+package kr.or.ddit.groupware.controller.rental;
+
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+@Controller
+@RequestMapping("/admin/rental")
+public class RentalManageController {
+
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@GetMapping("/approval")
+    public String rentApproval() {
+		
+		
+		return "admin/rental/approval";
+    }
+	
+	
+	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@GetMapping("/returnList")
+    public String returnList() {
+		
+		
+		
+		return "admin/rental/returnList";
+    }
+	
+	
+	
+	
+}

@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.service.drive;
+
+/**
+ * 자료실 서비스 인터페이스
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see IDriveService
+ */
+public interface IDriveService {
+
+}

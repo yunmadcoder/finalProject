@@ -1,0 +1,42 @@
+package kr.or.ddit.groupware.controller.mail;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.groupware.service.employee.IEmployeeService;
+import kr.or.ddit.groupware.service.mail.IMailService;
+import kr.or.ddit.groupware.vo.EmailVO;
+
+/**
+ * 관리자 메일통계 컨트롤러
+ * 
+ * @author <strong>최소희</strong>
+ * @version 1.0
+ * @see MailStatisticsController
+ */
+@Controller
+@RequestMapping("/admin")
+public class MailStatisticsController {
+	
+	@Inject
+	private IMailService service;
+
+	@Inject
+	private IEmployeeService employeeService;
+	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@GetMapping("/mailStatistics")
+	public String mailStatistics() {
+		
+		List<EmailVO> allEmailList = service.selectAllEmailList();
+		System.out.println("@@List"+allEmailList);
+		
+		return "admin/mail/mailStatistics";
+	}
+}

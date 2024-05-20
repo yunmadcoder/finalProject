@@ -1,0 +1,31 @@
+package kr.or.ddit.groupware.controller.approval;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.groupware.vo.DocFormVO;
+
+/**
+ * 전자결재 컨트롤러
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see ApprovalController
+ */
+@Controller
+@RequestMapping("/approval")
+public class ApprovalController {
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("")
+	public String approvalMain() {
+		return "approval/approvalmain";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/form")
+	public String approvalForm(DocFormVO docFormVO) {
+		return "approval/approvalform";
+	}
+}

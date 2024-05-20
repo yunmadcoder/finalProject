@@ -1,0 +1,95 @@
+package kr.or.ddit.groupware.controller.reservation;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.groupware.service.reservation.IReservationService;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.MtgRoomReservVO;
+import lombok.extern.slf4j.Slf4j;
+
+
+/**
+ * @method : roomReservation
+ * @auther : <strong>민경선</strong>
+ * @param  : vo
+ * @return : ""
+ * @date : 2024. 4. 17
+ */
+@Slf4j
+@Controller
+@RequestMapping("/")
+public class ReservationController {
+	@Autowired
+	private IReservationService reservationService;
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+    @GetMapping("/reservation")
+    public String showReservationPage(HttpServletRequest request, Model model) {
+       
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+
+		if(employeeVO !=null) {
+			model.addAttribute("user",employeeVO);
+		}
+		log.info("user정보", employeeVO);
+        return "main/reservation";
+    }
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@PostMapping("/addRoomReservation")
+	public ResponseEntity<String>reserveMeetingRoom(@RequestBody MtgRoomReservVO roomReservVO){
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		
+		roomReservVO.setEmplNo(employeeVO.getEmplNo());
+
+		
+		Result result = reservationService.addRoomReserv(roomReservVO);
+		
+		if(result.equals(Result.OK)) {
+			return new ResponseEntity<String>("success", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("failed", HttpStatus.OK);
+		}
+		
+	}
+	
+	
+	 @PreAuthorize("hasRole('ROLE_MEMBER')")
+	 @GetMapping("/reservations/{resourceType}")
+	 @ResponseBody
+	public List<MtgRoomReservVO> getReservationsByResourceType(@PathVariable("resourceType") String resourceType) {
+		  log.info("Fetching reservations for resourceType: {}", resourceType);
+	    CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	    EmployeeVO employeeVO = customUser.getEmployeeVO();
+	    
+	    MtgRoomReservVO roomReservVO = new MtgRoomReservVO();
+	    roomReservVO.setEmplNo(employeeVO.getEmplNo());
+	    roomReservVO.setResourceType(resourceType);
+	    
+	    return reservationService.getReservationsByResourceType( roomReservVO);
+	    
+	}
+	
+	
+	
+	
+}

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.approval.IApprovalMapper">
+
+	<resultMap type="sanctionerBookmarkGroupVO" id="bookmarkGroupMap">
+		<id property="sanctnerBkmkNo" column="sanctner_bkmk_no" />
+		<result property="sanctnerBkmkNm" column="sanctner_bkmk_nm" />
+		<result property="sanctionerOner" column="sanctioner_oner" />
+		<collection property="sanctionerBookmarkList" resultMap="bookmarkMap" />
+	</resultMap>
+	
+	<resultMap type="sanctionerBookmarkVO" id="bookmarkMap">
+		<result property="sanctnerBkmkNo" column="sanctner_bkmk_no" />
+		<result property="emplNo" column="empl_no" />
+		<result property="emplNm" column="empl_nm" />
+		<result property="clsfNm" column="clsf_nm" />
+		<result property="deptNm" column="dept_nm" />
+		<result property="sanctnerBkmkOrdr" column="sanctner_bkmk_ordr" />
+	</resultMap>
+	
+	<resultMap type="approvalVO" id="approvalMap">
+		<id property="aprovlNo" column="aprovl_no" />
+		<result property="aprovlNo" column="aprovl_no" />
+		<result property="docNo" column="doc_no" />
+		<result property="docNm" column="doc_nm" />
+		<result property="emplNo" column="empl_no" />
+		<result property="emplNm" column="empl_nm" />
+		<result property="aprovlNm" column="aprovl_nm" />
+		<result property="aprovlCn" column="aprovl_cn" />
+		<result property="aprovlMemo" column="aprovl_memo" />
+		<result property="aprovlTypeCode" column="aprovl_type_code" />
+		<result property="aprovlTypeNm" column="aprovl_type_nm" />
+		<result property="aprovlSttusCode" column="aprovl_sttus_code" />
+		<result property="aprovlSttusNm" column="aprovl_sttus_nm" />
+		<result property="emrgncyYn" column="emrgncy_yn" />
+		<result property="submitDt" column="submit_dt" />
+		<result property="closDt" column="clos_dt" />
+		<result property="atchFileGroupNo" column="atch_file_group_no" />
+		<result property="fileCount" column="file_count" />
+		<collection property="sanctionerList" resultMap="sanctionerMap" />
+	</resultMap>
+	
+	<resultMap type="sanctionerVO" id="sanctionerMap">
+		<result property="sanctnerNo" column="sanctner_no" />
+		<result property="approverNo" column="approver_no" />
+		<result property="approverNm" column="approver_nm" />
+		<result property="deptNm" column="dept_nm" />
+		<result property="emplProflPhoto" column="empl_profl_photo" />
+		<result property="aprovlNo" column="aprovl_no" />
+		<result property="sanctnerOrdr" column="sanctner_ordr" />
+		<result property="sanctnerDt" column="sanctner_dt" />
+		<result property="sanctnerSttusCode" column="sanctner_sttus_code" />
+		<result property="sanctnerSttusNm" column="sanctner_sttus_nm" />
+		<result property="rejectRsn" column="reject_rsn" />
+	</resultMap>
+	
+	<sql id="approvalTypeSQL">
+		<if test="type == 'temp'">
+        	and aprovl_sttus_code = 'G101'
+		</if>
+		<if test="type == 'inprogress'">
+        	and aprovl_sttus_code = 'G102'
+		</if>
+		<if test="type == 'complete'">
+        	and aprovl_sttus_code = 'G103'
+		</if>
+		<if test="type == 'return'">
+        	and aprovl_sttus_code = 'G104'
+		</if>
+		<if test="type == 'viewer'">
+		
+		</if>
+		<if test="type == 'approve'">
+		
+		</if>
+	</sql>
+	
+	<sql id="sanctnerTypeSQL">
+		<if test="type == 'all'">
+			and sanctner_sttus_code IN ('G301', 'G305')
+		</if>
+		<if test="type == 'wait'">
+			and sanctner_sttus_code = 'G301'
+		</if>
+		<if test="type == 'hold'">
+			and sanctner_sttus_code = 'G305'
+		</if>
+		<if test="type == 'upcoming'">
+			and sanctner_sttus_code = 'G302'
+		</if>
+		<if test="type == 'viewer'">
+			and ac.empl_no = #{approverNo}
+		</if>
+	</sql>
+	
+	<select id="selectApprovalList" parameterType="sanctionerVO" resultType="approvalVO">
+		select 
+			s.sanctner_no
+			, a.submit_dt
+			, s.aprovl_no
+			, d.doc_nm
+			, a.emrgncy_yn
+			, a.aprovl_nm
+			, a.atch_file_group_no
+			, e.empl_nm
+			, (SELECT COUNT(*) FROM attach_file b WHERE a.atch_file_group_no = b.atch_file_group_no) file_count
+		from approval a
+		JOIN sanctioner s on a.aprovl_no = s.aprovl_no
+		JOIN documents d on a.doc_no = d.doc_no
+		JOIN employee e on a.empl_no = e.empl_no
+		<if test="type != null and type == 'viewer'">
+			JOIN approval_corbon ac on s.aprovl_no = ac.aprovl_no
+		</if>
+		where approver_no = #{approverNo}
+		<if test="type != null">
+			<include refid="sanctnerTypeSQL" />
+		</if>
+        order by emrgncy_yn desc, submit_dt desc
+	</select>
+	
+	<select id="selectApprovalDocument" parameterType="int" resultMap="approvalMap">
+	    SELECT
+			a.aprovl_no
+			, a.doc_no
+			, d.doc_nm
+			, a.empl_no
+			, e.empl_nm
+			, a.aprovl_nm
+			, a.aprovl_cn
+			, a.aprovl_memo
+			, a.aprovl_type_code
+			, c1.cmmn_code_name1 AS aprovl_type_nm
+			, a.aprovl_sttus_code
+			, c2.cmmn_code_name1 AS aprovl_sttus_nm
+			, a.emrgncy_yn
+			, a.submit_dt
+			, a.clos_dt
+			, a.atch_file_group_no
+			, (SELECT COUNT(*) FROM attach_file b WHERE a.atch_file_group_no = b.atch_file_group_no) file_count
+			, s.sanctner_no
+			, s.approver_no
+			, e2.empl_nm AS approver_nm
+			, e2.empl_profl_photo
+			, c3.cmmn_code_name1 AS dept_nm
+			, s.sanctner_ordr
+			, s.sanctner_dt
+			, s.sanctner_sttus_code
+			, c4.cmmn_code_name1 AS sanctner_sttus_nm
+			, s.reject_rsn
+		FROM
+		    approval a
+		JOIN documents d ON d.doc_no = a.doc_no
+		JOIN sanctioner s ON a.aprovl_no = s.aprovl_no
+		JOIN employee e ON a.empl_no = e.empl_no
+		JOIN employee e2 ON s.approver_no = e2.empl_no
+		JOIN comm_code c1 ON a.aprovl_type_code = c1.cmmn_code
+		JOIN comm_code c2 ON a.aprovl_sttus_code = c2.cmmn_code
+		LEFT OUTER JOIN comm_code c3 ON e.dept_code = c3.cmmn_code
+		LEFT OUTER JOIN comm_code c4 ON s.sanctner_sttus_code = c4.cmmn_code
+		WHERE
+		    a.aprovl_no = #{approvlNo}
+		ORDER BY
+		    s.sanctner_ordr ASC
+	</select>
+
+	<select id="selectDraftList" parameterType="approvalVO" resultType="approvalVO">
+		select
+			aprovl_no
+			, a.doc_no
+            , d.doc_nm
+			, a.empl_no
+			, aprovl_nm
+			, aprovl_cn
+			, aprovl_memo
+			, aprovl_type_code
+            , (select cmmn_code_name1 from comm_code where aprovl_type_code = cmmn_code) as aprovl_type_nm
+			, aprovl_sttus_code
+            , (select cmmn_code_name1 from comm_code where aprovl_sttus_code = cmmn_code) as aprovl_sttus_nm
+			, aprovl_ipcr
+			, emrgncy_yn
+			, submit_dt
+			, clos_dt
+			, atch_file_group_no
+            , (
+                select 
+                    count(*)
+                from
+                    attach_file b
+                where a.atch_file_group_no = b.atch_file_group_no
+            ) file_count
+		from approval a
+        left outer join comm_code c on c.cmmn_code = aprovl_sttus_code and c.cmmn_code = aprovl_type_code
+        left outer join documents d on d.doc_no = a.doc_no
+        <if test="type != null">
+        	<if test="type == 'viewer'">
+				JOIN approval_corbon ac on s.aprovl_no = ac.aprovl_no
+        	</if>
+        	<if test="type == 'approve'">
+				JOIN sanctioner s on a.aprovl_no = s.aprovl_no
+        	</if>
+		</if>
+        where empl_no = #{emplNo}
+        <if test="type != null">
+	        <include refid="approvalTypeSQL" />
+        </if>
+	</select>
+	
+	<insert id="insertSanctioner" parameterType="SanctionerBookmarkVO">
+		insert into SANCTIONER_BOOKMARK(
+			sanctner_bkmk_no
+			, empl_no
+			, sanctner_bkmk_ordr
+		)values(
+			#{sanctnerBkmkNo}
+			, #{emplNo}
+			, #{sanctnerBkmkOrdr}
+		)
+	</insert>
+	
+	<insert id="insertSanctionerGroup" parameterType="sanctionerBookmarkGroupVO" useGeneratedKeys="true">
+		<selectKey resultType="int" keyProperty="sanctnerBkmkNo" order="BEFORE">
+			select SEQ_SANCTIONER_BOOKMARK_GROUP.nextval from dual
+		</selectKey>
+		insert into SANCTIONER_BOOKMARK_GROUP(
+			sanctner_bkmk_no
+			, sanctner_bkmk_nm
+			, sanctioner_oner
+		)values(
+			#{sanctnerBkmkNo}
+			, #{sanctnerBkmkNm}
+			, #{sanctionerOner}
+		)
+	</insert>
+	
+	<select id="selectMyLine" parameterType="sanctionerBookmarkGroupVO" resultMap="bookmarkGroupMap">
+		select 
+			sbg.sanctner_bkmk_no
+			, sbg.sanctner_bkmk_nm
+			, sbg.sanctioner_oner
+            , sb.empl_no
+            , e.empl_nm
+            , c.cmmn_code_name1 dept_nm
+            , cop.clsf_nm
+            , sb.sanctner_bkmk_ordr
+		from SANCTIONER_BOOKMARK_GROUP sbg
+        left outer join sanctioner_bookmark  sb on sb.sanctner_bkmk_no = sbg.sanctner_bkmk_no
+        left outer join employee e on e.empl_no = sb.empl_no
+        left outer join class_of_position cop on e.clsf_code = cop.clsf_code
+        left outer join comm_code c on e.dept_code = c.cmmn_code
+		where sbg.sanctioner_oner = #{sanctionerOner}
+        order by sb.sanctner_bkmk_ordr asc
+	</select>
+	
+	<insert id="insertApproval" parameterType="approvalVO" useGeneratedKeys="true">
+		<selectKey keyProperty="aprovlNo" resultType="int" order="BEFORE">
+			select seq_approval.nextval from dual
+		</selectKey>
+		insert into approval(
+			aprovl_no
+			, doc_no
+			, empl_no
+			, aprovl_nm
+			, aprovl_cn
+			, aprovl_memo
+			, aprovl_type_code
+			, aprovl_sttus_code
+			, emrgncy_yn
+			, submit_dt
+			, atch_file_group_no
+		)values(
+			#{aprovlNo}
+			, #{docNo}
+			, #{emplNo}
+			, #{aprovlNm}
+			, #{aprovlCn}
+			, #{aprovlMemo}
+			, #{aprovlTypeCode}
+			, #{aprovlSttusCode}
+			, #{emrgncyYn}
+			, sysdate
+			, #{atchFileGroupNo}
+		)
+	</insert>
+	
+	<insert id="insertSanctioners" parameterType="sanctionerVO">
+		insert into sanctioner(
+			sanctner_no
+			, approver_no
+			, aprovl_no
+			, sanctner_ordr
+		)values(
+			seq_sanctioner.nextval
+			, #{approverNo}
+			, #{aprovlNo}
+			, #{sanctnerOrdr}
+		)
+	</insert>
+	
+	<delete id="deleteMyLine" parameterType="sanctionerBookmarkGroupVO">
+		delete from SANCTIONER_BOOKMARK
+		where sanctner_bkmk_no = #{sanctnerBkmkNo}
+	</delete>
+	
+	<delete id="deleteMyLineGroup" parameterType="sanctionerBookmarkGroupVO">
+		delete from SANCTIONER_BOOKMARK_GROUP
+		where sanctner_bkmk_no = #{sanctnerBkmkNo}
+	</delete>
+
+	<select id="selectOragnTree" resultType="organizationTreeVO">
+		SELECT CMMN_CODE id
+			, CMMN_CODE_NAME1 text
+			, NVL(CMMN_CODE_OPTION1, '#') parent
+		FROM COMM_CODE
+		WHERE CMMN_GROUP_CODE LIKE '%' || 'D' || '%'
+		AND USE_YN = 'Y'
+		START WITH CMMN_CODE_OPTION1 IS NULL
+		CONNECT BY PRIOR CMMN_CODE = CMMN_CODE_OPTION1
+		ORDER SIBLINGS BY CMMN_CODE
+	</select>
+	
+</mapper>

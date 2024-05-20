@@ -1,0 +1,25 @@
+package kr.or.ddit.groupware.service.employee;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.EmployeeEstbsVO;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+
+/**
+ * 사원 서비스 인터페이스
+ * 
+ * @author <strong>최소희</strong>
+ * @version 1.0
+ * @see IEmployeeService
+ */
+public interface IEmployeeService {
+
+	public EmployeeVO selectEmployee(int empNo);
+	public Result pwCheck(EmployeeVO employeeVO);
+	public Result updateEmployee(EmployeeVO employeeVO);
+	public List<EmployeeVO> selectAllEmpl();
+	public List<EmployeeVO> selectDeptEmpl(String deptCode);
+	public EmployeeEstbsVO selectEstbsByEmplNo(EmployeeEstbsVO estbsVO);
+	public List<EmployeeVO> selectAllEmpl2();
+}

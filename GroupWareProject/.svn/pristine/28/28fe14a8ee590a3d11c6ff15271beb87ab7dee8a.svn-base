@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.service.rental;
+
+/**
+ * 예약 및 대여 서비스 구현체
+ * @author <strong>민경선</strong>
+ * @version 1.0
+ * @see RentalServiceImpl
+ */
+public class RentalServiceImpl implements IRentalService {
+
+}

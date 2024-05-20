@@ -1,0 +1,29 @@
+package kr.or.ddit.groupware.service.approval;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.groupware.mapper.approval.IApprovalMapper;
+import kr.or.ddit.groupware.vo.ApprovalVO;
+
+/**
+ * 전자 결재 서비스 구현체
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see ApprovalServiceImpl
+ */
+@Service
+public class ApprovalServiceImpl implements IApprovalService {
+	
+	@Inject
+	private IApprovalMapper approvalMapper;
+
+	@Override
+	public List<ApprovalVO> selectApprovalList(String type) {
+		return approvalMapper.selectApprovalList(type);
+	}
+
+}

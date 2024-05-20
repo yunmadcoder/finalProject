@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="kr.or.ddit.groupware.vo.EmployeeVO" alias="employeeVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.ClassOfPositionVO" alias="classOfPositionVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.EmpAuthorityVO" alias="empAuthorityVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.EmployeeEstbsVO" alias="employeeEstbsVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.WidgetVO" alias="widgetVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.BoardVO" alias="boardVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.ProjectVO" alias="projectVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.TaskVO" alias="taskVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.ScheduleVO" alias="scheduleVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.EmailVO" alias="emailVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.EmailReceptionVO" alias="emailReceptionVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AnswerVO" alias="answerVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AttachFileGroupVO" alias="attachFileGroupVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AttachFileVO" alias="attachFileVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AddressBookVO" alias="addressBookVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AddressGroupVO" alias="addressGroupVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.AddressGroupMappingVO" alias="addressGroupMappingVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.PaginationInfoVO" alias="pagingVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.MemoVO" alias="memoVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.DeptVO" alias="deptVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.ChatListVO" alias="chatListVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.MessageVO" alias="messageVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.MessageGroupVO" alias="messageGroupVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.MessageGroupParticipantVO" alias="messageGroupParticipantVO"/>
+		<typeAlias type="kr.or.ddit.groupware.vo.NotificationVO" alias="notificationVO"/>
+	</typeAliases>
+	
+</configuration>

@@ -1,0 +1,23 @@
+package kr.or.ddit.groupware.vo;
+
+import java.util.Date;
+
+import lombok.Data;
+
+@Data
+public class SanctionerVO {
+	private int sanctnerNo;
+	private int approverNo;
+	private String approverNm;
+	private int aprovlNo;
+	private int sanctnerOrdr;
+	private Date sanctnerDt;
+	private String sanctnerSttusCode;
+	private String sanctnerSttusNm;
+	private String rejectRsn;
+	
+	private String emplProflPhoto;
+	private String deptNm;
+	
+	private String type;
+}

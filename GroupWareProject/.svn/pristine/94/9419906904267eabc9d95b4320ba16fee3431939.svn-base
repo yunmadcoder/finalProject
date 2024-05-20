@@ -1,0 +1,122 @@
+package kr.or.ddit.groupware.service.answer;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.groupware.mapper.answer.IAnswerMapper;
+import kr.or.ddit.groupware.mapper.notification.INotificationMapper;
+import kr.or.ddit.groupware.util.NotificationUtil;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.AnswerVO;
+import kr.or.ddit.groupware.vo.BoardVO;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.NotificationVO;
+
+@Service
+public class AnswerServiceImpl implements IAnswerService {
+
+	@Inject
+	private IAnswerMapper answerMapper;
+	
+	@Inject
+	private NotificationUtil noti;
+	
+	@Inject
+	private INotificationMapper notificationMapper;
+
+	@Override
+	public void insertAnswer(AnswerVO answerVO) {
+	    answerMapper.insertAnswer(answerVO);
+
+	    // 단일 결과를 기대하는 대신 결과를 리스트로 받습니다.
+	    List<AnswerVO> answerList = answerMapper.getBoardWriters(answerVO);
+	    System.out.println(">>" + answerList);
+
+	    // 여러 작성자가 있는 경우 각각에 대한 알림을 전송합니다.
+	    for (AnswerVO answer : answerList) {
+	        NotificationVO notificationVO = new NotificationVO();
+	        System.out.println("##"+answer);
+	        // 알림 내용 설정
+	        String content = "[댓글]"
+	                .concat(answer.getAnswerNm() + " " + answer.getClsfNm())
+	                .concat("'님이 작성한'")
+	                .concat(answer.getReplyCn() + "'이(가) 도착했습니다!'");
+
+	        // 알림 객체 설정
+	        notificationVO.setNtcnRecp(answer.getBoardEmplNo());
+	        notificationVO.setNtcnTypeCode("N106"); // 받은메일
+	        notificationVO.setNtcnContent(content);
+	        notificationVO.setNtcnUrl("/board/detail?bbscttNo=" + answer.getBbscttNo() + "#answerList");
+	        notificationVO.setLocalDt(LocalDateTime.now());
+	        System.out.println("$$$$"+notificationVO);
+	        // 알림 삽입
+	        notificationMapper.insertNotification(notificationVO);
+
+	        // 알림 전송
+	        noti.sendNoti(answer.getBoardEmplNo());
+	    }
+	}
+
+	
+	
+
+	@Override
+	public List<AnswerVO> selectAnswer(int bbscttNo) {
+		return answerMapper.selectAnswer(bbscttNo);
+	}
+
+
+
+	@Override
+	public String updateAnswer(AnswerVO answerVO) {
+		int status = answerMapper.updateAnswer(answerVO);
+		return status > 0 ? Result.OK.toString() : Result.FAILED.toString();
+	}
+
+
+
+	@Override
+	public String deleteAnswer(AnswerVO answerVO) {
+		int status = answerMapper.deleteAnswer(answerVO);
+		return status > 0 ? Result.OK.toString() : Result.FAILED.toString();
+	}
+
+
+	
+	
+	
+	
+
+	@Override
+	public void insertAnswer2(AnswerVO answerVO) {
+		answerMapper.insertAnswer2(answerVO);
+		
+	}
+
+
+
+	@Override
+	public List<AnswerVO> selectReply(int upperAnswerNo) {
+		return answerMapper.selectReply(upperAnswerNo);
+	}
+
+
+
+	@Override
+	public String updateReply(AnswerVO answerVO) {
+		int status = answerMapper.updateReply(answerVO);
+		return status > 0 ? Result.OK.toString() : Result.FAILED.toString();
+	}
+
+
+
+	@Override
+	public String deleteReply(AnswerVO answerVO) {
+		int status = answerMapper.deleteReply(answerVO);
+		return status > 0 ? Result.OK.toString() : Result.FAILED.toString();
+	}
+}

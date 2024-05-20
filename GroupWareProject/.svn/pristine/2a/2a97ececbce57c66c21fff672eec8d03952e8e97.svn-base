@@ -1,0 +1,121 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<div class="d-flex align-items-center justify-content-between gap-6 m-3 d-lg-none">
+	<button class="btn btn-primary d-flex" type="button" data-bs-toggle="offcanvas" data-bs-target="#chat-sidebar" aria-controls="chat-sidebar">
+		<i class="ti ti-menu-2 fs-5"></i>
+	</button>
+	<form class="position-relative w-100">
+		<input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Contact">
+		<i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+	</form>
+</div>
+<div class="d-flex w-100">
+	<div class="left-part border-end w-15 flex-shrink-0 d-none d-lg-block">
+		<div class="px-9 pt-4 pb-3">
+			<button class="btn btn-outline-light-indigo text-dark fw-semibold rounded-0 py-8 w-100" id="approval-btn">새 결재 진행</button>
+		</div>
+		<div class="d-flex justify-content-center align-items-center">
+			<div class="accordion accordion-flush w-75" id="accordionPanelsStayOpenExample">
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="panelsStayOpen-headingOne">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+							<span class="font-weight-bold">자주 쓰는 양식</span>
+						</button>
+					</h2>
+					<div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+						<div class="accordion-body">
+							<div class="ms-3">
+								<a href="#">
+									<span>즐겨찾기 추가하기</span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+							<span class="font-weight-bold">결재하기</span>
+						</button>
+					</h2>
+					<div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+						<div class="accordion-body">
+							<div class="ms-3 content-area">
+								<a href="#">
+									<p>결재 대기 문서</p>
+								</a>
+								<a href="#">
+									<p>결재 수신 문서</p>
+								</a>
+								<a href="#">
+									<p>참조/열람 대기 문서</p>
+								</a>
+								<a href="#">
+									<p>결재 예정 문서</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="panelsStayOpen-headingThree">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+							<span class="font-weight-bold">개인문서함</span>
+						</button>
+					</h2>
+					<div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+						<div class="accordion-body">
+							<div class="ms-3 content-area">
+								<a href="#">
+									<p>기안 문서함</p>
+								</a>
+								<a href="#">
+									<p>임시 저장함</p>
+								</a>
+								<a href="#">
+									<p>결재 문서함</p>
+								</a>
+								<a href="#">
+									<p>참조/열람 문서함</p>
+								</a>
+								<a href="#">
+									<p>수신 문서함</p>
+								</a>
+								<a href="#">
+									<p>발송 문서함</p>
+								</a>
+								<a href="#">
+									<p>공문 문서함</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="panelsStayOpen-headingFour">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+							<span class="font-weight-bold">부서문서함</span>
+						</button>
+					</h2>
+					<div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingFour">
+						<div class="accordion-body">
+							<div class="ms-3 content-area">
+								<a href="#">
+									<p>기안 완료함</p>
+								</a>
+								<a href="#">
+									<p>부서 참조함</p>
+								</a>
+								<a href="#">
+									<p>부서 수신함</p>
+								</a>
+								<a href="#">
+									<p>공문 발송함</p>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

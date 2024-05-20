@@ -1,0 +1,25 @@
+package kr.or.ddit.groupware.vo;
+
+import java.sql.Date;
+
+import lombok.Data;
+
+@Data
+public class ApprovalVO {
+	private int aprovlNo;
+	private int docFrmNo;
+	private int emplNo;
+	private String aprovlNm;
+	private String aprovlCn;
+	private String aprovlMemo;
+	private String aprovlTypeCode;
+	private String aprovlSttusCode;
+	private String aprovlIpcr;
+	private String emrgncyYn;
+	private Date submitDt;
+	private Date closDt;
+	
+	private int atchFileGrpupNo;
+	
+	private String type;
+}

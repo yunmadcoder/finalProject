@@ -1,0 +1,17 @@
+package kr.or.ddit.groupware.mapper.approval;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.ApprovalVO;
+
+/**
+ * 전자결재 SQL Mapper
+ * @author 이명문
+ * @version 1.0
+ * @see IApprovalMapper
+ */
+public interface IApprovalMapper {
+
+	List<ApprovalVO> selectApprovalList(String type);
+
+}

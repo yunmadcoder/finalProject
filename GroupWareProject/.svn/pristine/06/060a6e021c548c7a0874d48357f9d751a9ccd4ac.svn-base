@@ -1,0 +1,220 @@
+package kr.or.ddit.groupware.controller.documents;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.documents.IDocumentsService;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.DocumentsVO;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+
+@Controller
+@RequestMapping("/documents")
+public class DocumentsController {
+
+	@Inject
+	private IDocumentsService documentsService;
+	
+	ObjectMapper mapper = new ObjectMapper();
+	
+	/**
+	 * @method : selectDocumentsList
+	 * @auther : <strong>이명문</strong>
+	 * @return : JSON 형식의 documentsList
+	 * @date : 2024. 4. 17
+	 */
+	@ResponseBody
+	@GetMapping(value = "/doclist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String selectDocumentsList() throws Exception {
+		List<DocumentsVO> documentsList = documentsService.selectDocumentsList();
+		return mapper.writeValueAsString(documentsList);
+	}
+	
+	
+	/**
+	 * @method : docListView 문서양식 메인 리스트 뷰 
+	 * @auther : <strong>이영주</strong>
+	 * @param :
+	 * @return :
+	 * @date : 2024. 4. 22
+	 *
+	 */
+	@GetMapping("/list")
+	public String docListView() {
+		
+		return "documents/documentslist";
+	}
+	
+	/**
+	 * @method : selectDocList
+	 * @auther : <strong>이영주</strong>
+	 * @param :
+	 * @return : jstree를 그리기 위한 리스트 
+	 * @date : 2024. 4. 22
+	 *
+	 */
+	@ResponseBody
+	@GetMapping(value = "/selectdoclist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String selectDocList() throws Exception {
+		List<DocumentsVO> docList = documentsService.selectDocList();
+		return mapper.writeValueAsString(docList);
+	}
+	/**
+	 * @method : insertDocFormView 문서양식 인서트화면출력
+	 * @auther : <strong>이영주</strong>
+	 * @param : 
+	 * @return : 문서양식 인서트 화면 
+	 * @date : 2024. 4. 22
+	 *
+	 */
+	@GetMapping("/insertdocform")
+	public String insertDocFormView() {
+		return "documents/documentsinsert";
+	}
+	
+	
+	/**
+	 * @method : modifyDocFormView 수정폼
+	 * @auther : <strong>이영주</strong>
+	 * @param : int docNo 문서시퀀스번호
+	 * @return : 수정폼으로 분기처리 된 인서트폼 
+	 * @date : 2024. 4. 24
+	 *
+	 */
+	@GetMapping("/modifydocform")
+	public String modifyDocFormView(Model model, int docNo) {
+		
+		DocumentsVO selectOne = documentsService.selectOneDoc(docNo);
+		
+		model.addAttribute("selectOne", selectOne);
+		model.addAttribute("status", "u");
+		return "documents/documentsinsert";
+	}
+	/**
+	 * @method : insertDocuments
+	 * @auther : <strong>이영주</strong>
+	 * @param :
+	 * @return :
+	 * @date : 2024. 4. 22
+	 *
+	 */
+	@PostMapping("/insertdocform")
+	public String insertDocuments(DocumentsVO docVO,Model model) {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO userVO = customUser.getEmployeeVO(); 
+		int emplNo = userVO.getEmplNo();
+		
+		docVO.setDocRegister(emplNo);					//사원번호
+		docVO.setDocTypeCode(docVO.getDocTypeCode());	//분류코드
+		docVO.setDocUpdusr(emplNo);
+		String goPage = "";
+		
+		Result result = documentsService.insertDocform(docVO);
+		if(result.equals(Result.OK)) {
+			goPage = "redirect:list";
+		}else {
+			goPage = "documents/list"; //바꿔야 
+		}
+		return goPage;
+	}
+	
+	/**
+	 * @method : 문서 수정 post 방식
+	 * @auther : <strong>이영주</strong>
+	 * @param : model, 수정하는 사원의 번호, 문서 제목, 내용, 사용여부, 분류 
+	 * @return : 목록 페이지 
+	 * @date : 2024. 4. 24
+	 *
+	 */
+	@PostMapping("/modifydocform")
+	public String modifyDocForm(DocumentsVO docVO,Model model) {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO userVO = customUser.getEmployeeVO(); 
+		int emplNo = userVO.getEmplNo();
+		
+		docVO.setDocUpdusr(emplNo);
+		String goPage = "";
+		
+		Result result = documentsService.updateDocuments(docVO);
+		if(result.equals(Result.OK)) {
+			goPage = "redirect:list";
+		}else {
+			goPage = "documents/list"; //바꿔야 
+		}
+		return goPage;
+	}
+	
+	
+	/**
+	 * @method : updateDocForm
+	 * @auther : <strong>이영주</strong>
+	 * @param : 사원번호, docNo, docNm
+	 * @return : 업데이트 된 docVO
+	 * @date : 2024. 4. 23
+	 *
+	 */
+	@PostMapping(value = "/updateDocForm", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateDocForm(@RequestBody DocumentsVO docVO) throws Exception{
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO userVO = customUser.getEmployeeVO(); 
+		int emplNo = userVO.getEmplNo();
+		docVO.setDocUpdusr(emplNo);
+		
+		Result result = documentsService.updateDocForm(docVO);
+		
+		String updateVO = mapper.writeValueAsString(docVO);
+		
+		if(result.equals(Result.OK)) {
+			return new ResponseEntity<String>(updateVO,HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("FAILED",HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+
+	@PostMapping(value = "/delSelectedDoc")
+	public ResponseEntity<String> delSelectedDoc(@RequestBody DocumentsVO docVO){
+		
+		int docNo = docVO.getDocNo();
+		
+		int result = documentsService.delSelectedDoc(docNo);
+
+		if (result > 0) {
+			return new ResponseEntity<String>("OK", HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<String>("FAILED", HttpStatus.BAD_REQUEST);
+		}
+	}
+		
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+

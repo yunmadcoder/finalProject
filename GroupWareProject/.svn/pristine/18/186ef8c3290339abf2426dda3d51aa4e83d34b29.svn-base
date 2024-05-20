@@ -1,0 +1,18 @@
+package kr.or.ddit.groupware.vo;
+
+import java.util.Date;
+import lombok.Data;
+
+@Data
+public class ProjectReportVO {
+	private int prjctReprtNo;
+	private int prjctNo;
+	private int emplNo;
+	private String emplNm;
+	private String prjctReprtNm;
+	private String prjctReprtCn;
+	private Date prjctReprtRgdde;
+	private Date prjctReprtUpdde;
+	private int atchFileGrpNo;
+	private String prjctReprtWd;
+}

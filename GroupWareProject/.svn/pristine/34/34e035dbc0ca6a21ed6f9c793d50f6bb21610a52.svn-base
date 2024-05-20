@@ -1,0 +1,19 @@
+package kr.or.ddit.groupware.mapper.project;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.ProjectVO;
+
+/**
+ * 프로젝트 SQL Mapper
+ * @author 권예은
+ * @version 1.0
+ * @see IProjectMapper
+ */
+public interface IProjectMapper {
+
+	List<ProjectVO> selectProjectListByEmplNo(int emplNo);
+	List<ProjectVO> selectAvailableProjectListByEmplNo(int emplNo);
+	List<Integer> selectProjectParticipant(int projectNo);
+
+}

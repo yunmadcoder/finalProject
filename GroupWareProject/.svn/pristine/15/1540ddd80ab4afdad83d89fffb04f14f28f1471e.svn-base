@@ -1,0 +1,164 @@
+package kr.or.ddit.groupware.controller.approval;
+
+import java.security.Principal;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.approval.IApprovalService;
+import kr.or.ddit.groupware.service.attach.IAttachFileService;
+import kr.or.ddit.groupware.service.employee.IEmployeeService;
+import kr.or.ddit.groupware.util.FileUtil;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.ApprovalVO;
+import kr.or.ddit.groupware.vo.AttachFileGroupVO;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.OrganizationTreeVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkGroupVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkVO;
+import kr.or.ddit.groupware.vo.SanctionerVO;
+
+/**
+ * 전자결재 컨트롤러
+ * 
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see ApprovalController
+ */
+@Controller
+@RequestMapping("/approval")
+public class ApprovalController {
+
+	@Inject
+	private IApprovalService approvalService;
+	
+	@Inject
+	private IEmployeeService employeeService;
+	
+	@Inject
+	private IAttachFileService attachFileService;
+	
+	ObjectMapper mapper = new ObjectMapper();
+
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("")
+	public String approvalMain() {
+		return "approval/approvalmain";
+	}
+
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/form")
+	public String approvalForm(Model model) {
+		return "approval/approvalform";
+	}
+
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/list/{type}")
+	public String approvalList(@PathVariable String type, Model model) {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		SanctionerVO sanctionerVO = new SanctionerVO();
+		sanctionerVO.setApproverNo(customUser.getEmployeeVO().getEmplNo());
+		sanctionerVO.setType(type);
+		System.out.println("TYPE >>" + type);
+		List<ApprovalVO> approvalList = approvalService.selectApprovalList(sanctionerVO);
+		model.addAttribute("approvalList", approvalList);
+		return "approval/approvallist";
+	}
+	
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/document/{aprovlNo}")
+	public String approvalDocument(@PathVariable int aprovlNo, Model model) {
+		ApprovalVO approvalVO = approvalService.selectApprovalDocument(aprovlNo);
+		AttachFileGroupVO attachFileGroupVO = attachFileService.getAttachFileGroup(approvalVO.getAtchFileGroupNo());
+		model.addAttribute("approvalVO", approvalVO);
+		model.addAttribute("attachFileGroupVO", attachFileGroupVO);
+		return "approval/approvaldetail";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/doclist/draft/{type}")
+	public String approvalDocList(@PathVariable String type, Model model) {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		ApprovalVO approvalVO = new ApprovalVO();
+		approvalVO.setEmplNo(customUser.getEmployeeVO().getEmplNo());
+		approvalVO.setType(type);
+		
+		List<ApprovalVO> approvalList = approvalService.selectDraftList(approvalVO);
+		model.addAttribute("approvalList", approvalList);
+		model.addAttribute("type", type);
+		
+		return "approval/approvaldraftlist";
+	}
+
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@PostMapping(value = "/insert")
+	public ResponseEntity<String> approvalInsert(ApprovalVO approvalVO) {
+		Result result = approvalService.insertApproval(approvalVO);
+		return result.equals(Result.OK) ?  ResponseEntity.status(HttpStatus.OK).body(result.toString()) :
+			ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.toString());
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@PostMapping(value = "/sanctioner/insertgroup", produces = "text/plain; charset=UTF-8")
+	public String insertSanctionerGroup(@RequestBody SanctionerBookmarkGroupVO vo) throws Exception {
+		approvalService.insertSanctionerGroup(vo);
+		return String.valueOf(vo.getSanctnerBkmkNo());
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@PostMapping(value = "/sanctioner/insert")
+	public ResponseEntity<String> insertSanctionerGroup(@RequestBody SanctionerBookmarkVO[] bookmarkList) throws Exception {
+		Result result = approvalService.insertSanctioner(bookmarkList);
+		return ResponseEntity.ok(result.toString());
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@GetMapping(value = "/senctioner/myline", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String selectMyLine(SanctionerBookmarkGroupVO vo) throws Exception {
+		List<SanctionerBookmarkGroupVO> groupList = approvalService.selectMyLine(vo);
+		return mapper.writeValueAsString(groupList);
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@ResponseBody
+	@PostMapping(value = "/senctioner/delete", produces = "text/plain; charset=UTF-8")
+	public String deleteMyLine(@RequestBody SanctionerBookmarkGroupVO vo) {
+		Result result = approvalService.deleteMyLine(vo);
+		return result.toString();
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value = "/organtree", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> selcetOragnTree() throws Exception {
+		List<OrganizationTreeVO> organList = approvalService.selectOragnTree();
+		return ResponseEntity.ok(mapper.writeValueAsString(organList));
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping(value = "/emplist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> selectEmpList() throws Exception {
+		List<EmployeeVO> empList = employeeService.selectAllEmpl2();
+		return ResponseEntity.ok(mapper.writeValueAsString(empList));
+	}
+	
+}

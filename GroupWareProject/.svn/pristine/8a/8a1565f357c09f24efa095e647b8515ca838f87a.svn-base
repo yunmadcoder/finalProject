@@ -1,0 +1,132 @@
+package kr.or.ddit.groupware.controller;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Random;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base32;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/test")
+public class TestClass {
+
+	private static String secretKey = null;
+	
+	@RequestMapping("/api/otp")
+	public String otp(Model model) {
+		String encodedKey = getEncodedKey();
+		String qrUrl = getQrBarcodeURL("admin", "ThinkLink", encodedKey);
+		
+		model.addAttribute("encodedKey", encodedKey);
+		model.addAttribute("QrUrl", qrUrl);
+		
+		System.out.println(encodedKey);
+		System.out.println(qrUrl);
+		
+		return "test";
+	}
+	
+	@RequestMapping("/api/check")
+	public String check(Model model, String code, String encodedKey) {
+		
+		System.out.println("받아온 키 : " + code);
+		System.out.println("인코딩 키 : " + encodedKey);
+		
+		try {
+			
+		long codeCheck = Integer.parseInt(code);
+		long l = new Date().getTime();
+		long ll = l / 30000;
+		
+		boolean check_code = false;
+		check_code = check_code(encodedKey, codeCheck, ll);
+		
+		if(!check_code) {
+			System.out.println("일치하지 않당..");
+			String key = getEncodedKey();
+			String qrUrl = getQrBarcodeURL("admin", "ThinkLink", key);
+			
+			model.addAttribute("encodedKey", key);
+			model.addAttribute("QrUrl", qrUrl);
+			
+			return "test";
+		}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("성공햇당");
+		
+		return "result";
+	}
+	
+	public static String getEncodedKey() {
+		byte[] buffer = new byte[5 + 5 * 5];
+		new Random().nextBytes(buffer);
+		Base32 codec = new Base32();
+		byte[] secretKey = Arrays.copyOf(buffer, 10);
+		byte[] bEncodedkey = codec.encode(secretKey);
+		
+		String encodedKey = new String(bEncodedkey);
+		
+		return encodedKey;
+	}
+	
+	public static String getQrBarcodeURL(String user, String host, String secretKey) {
+		String format = "http://chart.apis.google.com/chart?cht=qr&chs=200x200&chl=otpauth://totp/%s@%s%%3Fsecret%%3D%s&chld=H|0";
+		return String.format(format, user, host, secretKey);
+	}
+	
+	private static boolean check_code(String secretKey, long code, long t) throws InvalidKeyException, NoSuchAlgorithmException {
+		Base32 codec = new Base32();
+		byte[] decodedKey = codec.decode(secretKey);
+		
+		int window = 3;
+		for (int i = -window; i <= window; ++i) {
+			long hash = verify_code(decodedKey, t + i);
+			
+			if (hash == code) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private static int verify_code(byte[] key, long t) throws NoSuchAlgorithmException, InvalidKeyException {
+		byte[] data = new byte[8];
+		long value = t;
+		
+		for(int i = 8; i-- > 0; value >>>= 8) {
+			data[i] = (byte) value;
+		}
+		
+		SecretKeySpec signKey = new SecretKeySpec(key, "HmacSHA1");
+		Mac mac = Mac.getInstance("HmacSHA1");
+		mac.init(signKey);
+		byte[] hash = mac.doFinal(data);
+		
+		int offset = hash[20 - 1] & 0xF;
+		
+		long truncatedHash = 0;
+		
+		for (int i = 0; i < 4; ++i) {
+			truncatedHash <<= 8;
+			truncatedHash |= (hash[offset + i] & 0xFF);
+		}
+		
+		truncatedHash &= 0x7FFFFFFF;
+		truncatedHash %= 1000000;
+		
+		return (int) truncatedHash;
+	}
+}

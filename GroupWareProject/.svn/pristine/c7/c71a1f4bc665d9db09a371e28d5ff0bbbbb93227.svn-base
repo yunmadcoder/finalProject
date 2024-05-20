@@ -1,0 +1,18 @@
+package kr.or.ddit.groupware.controller.common;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@GetMapping("/main")
+	public String adminMain() {
+		return "admin/main_admin";
+	}
+}

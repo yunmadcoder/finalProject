@@ -1,0 +1,78 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<!-- import css -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/project/css/layout/aside.css" />
+<!-- import js -->
+<script src="${pageContext.request.contextPath }/resources/project/js/layout/aside.js"></script>
+
+<!-- 사이드바 시작 -->
+
+<aside class="left-sidebar with-vertical">
+	<div>
+
+		<!-- ---------------------------------- -->
+		<!-- 사이드바 메뉴 시작 -->
+		<!-- ---------------------------------- -->
+		<div class="brand-logo d-flex align-items-center">
+			<a href="/" class="text-nowrap logo-img">
+				<img src="${pageContext.request.contextPath}/resources/vendor/images/logos/dark-logo.png" class="logo dark-logo" alt="Logo-Dark" />
+				<%-- 				<img src="${pageContext.request.contextPath}/resources/vendor/images/logos/dark-logo.png" class="logo light-logo" alt="Logo-light" /> --%>
+				<%--                 <img src="${pageContext.request.contextPath}/resources/vendor/images/logos/light-logo.svg" class="logo light-logo" alt="Logo-light" /> --%>
+			</a>
+			<a href="javascript:void(0)" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
+				<i class="ti ti-x"></i>
+			</a>
+		</div>
+		<div>
+
+
+			<nav class="sidebar-nav scroll-sidebar" data-simplebar>
+				<ul id="sidebarnav">
+					<li class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+							<span class="d-flex"> <i class="ti ti-box-multiple"></i>
+							</span> <span class="hide-menu">Menu Level</span>
+						</a>
+						<ul aria-expanded="false" class="collapse first-level">
+							<li class="sidebar-item"><a href="javascript:void(0)" class="sidebar-link">
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-circle"></i>
+									</div>
+									<span class="hide-menu">Level 1</span>
+								</a></li>
+							<li class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-circle"></i>
+									</div>
+									<span class="hide-menu">Level 1.1</span>
+								</a>
+								<ul aria-expanded="false" class="collapse two-level">
+									<li class="sidebar-item"><a href="javascript:void(0)" class="sidebar-link">
+											<div class="round-16 d-flex align-items-center justify-content-center">
+												<i class="ti ti-circle"></i>
+											</div>
+											<span class="hide-menu">Level 2</span>
+										</a></li>
+									<li class="sidebar-item"><a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+											<div class="round-16 d-flex align-items-center justify-content-center">
+												<i class="ti ti-circle"></i>
+											</div>
+											<span class="hide-menu">Level 2.1</span>
+										</a>
+										<ul aria-expanded="false" class="collapse three-level">
+											<li class="sidebar-item"><a href="javascript:void(0)" class="sidebar-link">
+													<div class="round-16 d-flex align-items-center justify-content-center">
+														<i class="ti ti-circle"></i>
+													</div>
+													<span class="hide-menu">Level 3</span>
+												</a></li>
+											<li class="sidebar-item"><a href="javascript:void(0)" class="sidebar-link">
+													<div class="round-16 d-flex align-items-center justify-content-center">
+														<i class="ti ti-circle"></i>
+													</div>
+													<span class="hide-menu">Level 3.1</span>
+												</a></li>
+										</ul></li>
+								</ul></li>
+						</ul></li>
+				</ul>
+			</nav>

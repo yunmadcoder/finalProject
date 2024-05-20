@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.notification.INotificationMapper">
+	<insert id="insertNotification" parameterType="notificationVO">
+		insert into notification(
+		    ntcn_no
+		    , ntcn_recp
+		    , ntcn_type_code
+		    , ntcn_content
+		    , ntcn_url
+		    , ntcn_dt
+		)values(
+		    seq_notification.nextval
+		    , #{ntcnRecp}
+		    , #{ntcnTypeCode}
+		    , #{ntcnContent}
+		    , #{ntcnUrl}
+		    , #{localDt}
+		)
+	</insert>
+
+	<select id="selectNotiList" parameterType="int" resultType="notificationVO">
+		select 
+			ntcn_no
+			, ntcn_recp
+			, ntcn_type_code
+			, ntcn_content
+			, ntcn_url
+			, ntcn_read_dt
+		    , ntcn_dt local_dt
+		    , TO_CHAR(ntcn_dt, 'yyyy-MM-dd HH24:MI') ntcn_dt
+		from notification
+		where ntcn_recp = #{emplNo}
+		and sysdate >= ntcn_dt
+	</select>
+	
+	<select id="selectNotReadNotiList" parameterType="int" resultType="notificationVO">
+		select 
+			ntcn_no
+			, ntcn_recp
+			, ntcn_type_code
+			, ntcn_content
+			, ntcn_url
+			, ntcn_read_dt
+		    , ntcn_dt local_dt
+		    , TO_CHAR(ntcn_dt, 'yyyy-MM-dd HH24:MI') ntcn_dt
+		from notification
+		where ntcn_recp = #{emplNo}
+		and ntcn_read_dt is null
+		and sysdate > ntcn_dt
+	</select>
+	
+	<select id="selectNotReadNotiFive" parameterType="int" resultType="notificationVO">
+		SELECT * FROM (
+		    SELECT 
+		        ntcn_no
+		        , ntcn_recp
+		        , ntcn_type_code
+				, CASE WHEN LENGTH(ntcn_content) > 25 THEN SUBSTR(ntcn_content, 1, 25) || '...' ELSE ntcn_content END as ntcn_content
+		        , ntcn_url
+		        , ntcn_read_dt
+			    , ntcn_dt local_dt
+			    , TO_CHAR(ntcn_dt, 'yyyy-MM-dd HH24:MI') ntcn_dt
+		    FROM notification
+		    WHERE ntcn_recp = #{emplNo}
+		    AND ntcn_read_dt is null
+		    AND sysdate > ntcn_dt
+		    ORDER BY ntcn_dt DESC 
+		) 
+		<![CDATA[
+			WHERE ROWNUM <= 5
+		]]>
+	</select>
+	
+	<update id="notiRead" parameterType="notificationVO">
+		update notification
+		set ntcn_read_dt = sysdate
+		where ntcn_no = #{ntcnNo}
+	</update>
+	
+	<delete id="notiDelete" parameterType="notificationVO">
+		delete 
+		from notification
+		where ntcn_no = #{ntcnNo}	
+	</delete>
+</mapper>

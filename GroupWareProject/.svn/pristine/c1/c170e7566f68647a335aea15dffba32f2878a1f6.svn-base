@@ -1,0 +1,23 @@
+package kr.or.ddit.groupware.service.documents;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.groupware.mapper.documents.IDocumentsMapper;
+import kr.or.ddit.groupware.vo.DocumentsVO;
+
+@Service
+public class DocumentsServiceImpl implements IDocumentsService {
+	
+	@Inject
+	private IDocumentsMapper documentsMapper;
+
+	@Override
+	public List<DocumentsVO> selectDocumentsList() {
+		return documentsMapper.selectDocumentsList();
+	}
+
+}

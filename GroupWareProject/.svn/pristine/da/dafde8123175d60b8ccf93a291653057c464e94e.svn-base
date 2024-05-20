@@ -1,0 +1,16 @@
+package kr.or.ddit.groupware.util;
+
+public enum TableCode {
+	EMPLOYEE("사원"), BOARD("게시글"), MESSAGE("채팅방"), EMAIL("메일"),
+	MEMO("메모"), PROJECT("프로젝트"), DRAFT("전자결재"), DRIVE("자료실");
+	
+	private String value;
+	
+	TableCode(String value) {
+		this.value = value;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+}

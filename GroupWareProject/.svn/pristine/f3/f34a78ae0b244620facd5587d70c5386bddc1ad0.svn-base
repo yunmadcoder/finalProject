@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.mapper.rental;
+
+/**
+ * 예약 및 대여 SQL Mapper
+ * @author 민경선
+ * @version 1.0
+ * @see IRentalMapper
+ */
+public interface IRentalMapper {
+
+}

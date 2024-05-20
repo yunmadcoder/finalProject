@@ -1,0 +1,343 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!-- 사이드바 시작 -->
+<style>
+.logo {
+	width: 150px;
+	align: center;
+}
+
+.brand-logo {
+	justify-content: center;
+	margin-top: 15px;
+	margin-right: 10px;
+}
+
+.fixed-organ-tree {
+	display: block;
+}
+
+.modal-organixationtree {
+	max-width: var(- -bs-modal-width);
+	margin-left: 260px;
+	margin-top: calc(100vh - 500px);
+}
+
+.organization-tree-search {
+	border-bottom: solid 1px lightgray;
+	width: 100%;
+	padding: 8px;
+}
+
+.organization-tree-search-box {
+	border: none;
+}
+
+.organ-tree .has-arrow {
+	display: flex;
+    align-items: center;
+}
+
+.organ-tree .has-arrow.active::after {
+	top: 18px;
+	margin-top: 1px;
+	border-color: var(- -bs-white);
+	transform: rotate(-135deg) translate(0, -50%);
+}
+
+.organ-tree .has-arrow::after {
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-width: 1px 0 0 1px;
+	border-style: solid;
+	border-color: var(- -bs-dark-text-emphasis);
+	margin-left: 10px;
+	transform: rotate(135deg) translate(0, -50%);
+	transform-origin: top;
+	top: 22px;
+	right: 15px;
+	transition: all 0.3s ease-out;
+}
+
+.organ-tree ul {
+  padding-left: 15px;
+}
+
+.organ-tree-empl{
+  display: flex;
+  font-size: 14px;
+  white-space: nowrap;
+  align-items: center;
+  line-height: 25px;
+  position: relative;
+  margin: 0px 0px 2px;
+  padding: 10px;
+  border-radius: 16px;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 400;
+  background-color: #F2F2E4;
+  box-shadow: var(--card-box-shadow);
+  color: var(--bs-gray-900);
+}
+
+.yen-inner-imag{
+  width: 100%;
+}
+.tree-ad-icon{
+  margin-left: 8px;
+  display: flex;
+  gap: 10px;
+}
+#organization-tree-search-box{
+  border: none;
+  &:focus {
+    outline: none;
+  }
+}
+</style>
+<aside class="left-sidebar with-vertical">
+<div>
+
+		<!-- ---------------------------------- -->
+		<!-- 사이드바 메뉴 시작 -->
+		<!-- ---------------------------------- -->
+		<div class="brand-logo d-flex align-items-center">
+			<a href="/" class="text-nowrap logo-img">
+				<img src="${pageContext.request.contextPath}/resources/vendor/images/logos/dark-logo.png" class="logo dark-logo" alt="Logo-Dark" />
+				<%-- 				<img src="${pageContext.request.contextPath}/resources/vendor/images/logos/dark-logo.png" class="logo light-logo" alt="Logo-light" /> --%>
+				<%--                 <img src="${pageContext.request.contextPath}/resources/vendor/images/logos/light-logo.svg" class="logo light-logo" alt="Logo-light" /> --%>
+			</a>
+			<a href="javascript:void(0)" class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none">
+				<i class="ti ti-x"></i>
+			</a>
+		</div>
+	<div>
+
+
+		<nav class="sidebar-nav scroll-sidebar" data-simplebar>
+			<ul id="sidebarnav">
+				<li class="sidebar-item"><a class="sidebar-link" href="/" aria-expanded="false">
+						<span> <i class="fa-solid fa-house fa-fw"></i>
+						</span> <span class="hide-menu">홈</span>
+					</a></li>
+				<li class="sidebar-item"><a class="sidebar-link" href="/project" aria-expanded="false">
+						<span> <i class="fa-solid fa-users fa-fw"></i>
+						</span> <span class="hide-menu">프로젝트</span>
+					</a></li>
+				<li class="sidebar-item"><a class="sidebar-link" href="/approval" aria-expanded="false">
+						<span> <i class="fa-solid fa-file-signature fa-fw"></i>
+						</span> <span class="hide-menu">전자결재</span>
+					</a></li>
+				<li class="sidebar-item"><a class="sidebar-link" href="/schedule" aria-expanded="false">
+						<span> <i class="fa-solid fa-calendar-day fa-fw"></i>
+						</span> <span class="hide-menu">캘린더</span>
+					</a></li>
+				<!-- 자료실 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/drive" aria-expanded="false">
+						<span> <i class="fa-solid fa-folder-closed fa-fw"></i>
+						</span> <span class="hide-menu">자료실</span>
+					</a></li>
+				<!-- 메일 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/mail/inbox" aria-expanded="false">
+						<span> <i class="fa-solid fa-envelope fa-fw"></i>
+						</span> <span class="hide-menu">메일</span>
+					</a></li>
+				<!-- 근태 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/" aria-expanded="false">
+						<span> <i class="fa-solid fa-briefcase fa-fw"></i>
+						</span> <span class="hide-menu">근태관리</span>
+					</a></li>
+				<!-- 채팅 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/chat" aria-expanded="false">
+						<span> <i class="fa-solid fa-comments fa-fw"></i>
+						</span> <span class="hide-menu">채팅</span>
+					</a></li>
+				<!-- 메모 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/note" aria-expanded="false">
+						<span> <i class="fa-solid fa-note-sticky fa-fw"></i>
+						</span> <span class="hide-menu">메모</span>
+					</a></li>
+				<!-- 게시판 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/board" aria-expanded="false">
+						<span> <i class="fa-solid fa-chalkboard fa-fw"></i>
+						</span> <span class="hide-menu">게시판</span>
+					</a></li>
+				<!-- 주소록 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/address/addresstable" aria-expanded="false">
+						<span> <i class="fa-regular fa-address-book fa-fw"></i>
+						</span> <span class="hide-menu">주소록</span>
+					</a></li>
+				<!-- 예약 -->
+				<li class="sidebar-item"><a class="sidebar-link" href="/rental" aria-expanded="false">
+						<span> <iconify-icon icon="wpf:car-rental"></iconify-icon>
+						</span> <span class="hide-menu">예약 및 대여</span>
+					</a></li>
+			</ul>
+		</nav>
+
+		<!-- 조직도 아이콘 -->
+		<button id="btn-organtree-modal" style="display: none;" class="btn" data-bs-toggle="modal" data-bs-target="#organ-tree-modal" data-backdrop="false"></button>
+		<div class="fixed-organ-tree p-3 mx-4 mb-2 btn btn-light rounded mt-3 col">
+			<button id="btn-organtree" class="btn">
+				<div class="hstack gap-3">
+					<div class="john-img">
+						<i class="fa-regular fa-sitemap fa-fw"></i>
+					</div>
+					<div>
+						<h6 class="mb-0 fs-4 fw-semibold">조직도</h6>
+					</div>
+				</div>
+			</button>
+		</div>
+
+		<!-- 프로필 카드 -->
+		<div class="fixed-profile p-3 mx-4 mb-2 bg-secondary-subtle rounded mt-3">
+			<div class="hstack gap-3">
+				<div class="john-img">
+					<img src="${pageContext.request.contextPath}/resources/vendor/images/profile/user-1.jpg" class="rounded-circle" width="40" height="40" alt="" />
+				</div>
+				<div class="john-title">
+					<h6 class="mb-0 fs-4 fw-semibold">Mathew</h6>
+					<span class="fs-2">Designer</span>
+				</div>
+				<button class="border-0 bg-transparent text-primary ms-auto" tabindex="0" type="button" aria-label="logout" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="logout">
+					<i class="ti ti-power fs-6"></i>
+				</button>
+			</div>
+		</div>
+
+		<!-- ---------------------------------- -->
+		<!-- Start Vertical Layout Sidebar -->
+		<!-- ---------------------------------- -->
+	</div>
+</aside>
+
+<!-- 조직도 모달 -->
+<div class="modal fade" id="organ-tree-modal" data-backdrop="false" tabindex="-1" aria-labelledby="mySmallModalLabel" aria-hidden="true" style="display: none;">
+	<div id="modal-organTree" class="modal-organixationtree modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header d-flex align-items-center">
+				<div class="organization-tree-search">
+					<i class="fa-solid fa-magnifying-glass"></i>
+					<input class="organization-tree-search-box" type="text" placeholder="이름/부서/직책/전화번호로 검색">
+				</div>
+			</div>
+			<div class="modal-body organ-tree dropdown">
+				<!-- 조직도 시작 -->
+				<ul id="dept-D301" aria-expanded="false" class="collapse in">
+				</ul>
+				<!-- 조직도 끝 -->
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- 조직도 모달 끝 -->
+
+<!--  Sidebar End -->
+<script>
+var icon = "<i class='fa-regular fa-envelope'></i><i class='fa-regular fa-address-book'></i><i class='fa-regular fa-comments'></i>";
+// 조직도 모달 열고 배경 제거
+$(document).on('click', '#btn-organtree', function() {
+	$('#dept-D301').empty();
+	makeTree("D301");
+	document.getElementById('btn-organtree-modal').click();
+	$(".modal-backdrop").remove();
+	$(".modal-organixationtree").css({"margin-left":"260px","margin-top":"calc(100vh - 500px)"});
+	$(".tree-ad-icon").html(icon);
+	$(".organ-tree-empl").off("click");
+});
+
+// 조직도 드롭다운
+$(document).on('click', '.organ-tree .has-arrow', function() {
+	
+	if(!$(this).hasClass("active")) { // 클릭한 요소가 활성화되어있지 않은 상태일 때
+        // 열려있는 메뉴를 숨기고 다른 클래스를 모두 제거합니다.
+        $("ul", $(this).parents("ul:first")).removeClass("in");
+        $("a", $(this).parents("ul:first")).removeClass("active");
+  
+        // 새로운 메뉴를 열고 'active' 클래스를 추가합니다.
+        $(this).next("ul").addClass("in");
+        $(this).addClass("active");
+	} else if ($(this).hasClass("active")) { // 선택된 링크에 'active' 클래스가 있는 경우
+        $(this).removeClass("active"); // 'active' 클래스를 제거합니다.
+        $(this).parents("ul:first").removeClass("active");
+        $(this).next("ul").removeClass("in"); // 다음 <ul>에서 'in' 클래스를 제거합니다.
+    }
+});
+
+// 조직도 만들기~
+function makeTree(deptCode) {
+	var getEmpl = $.ajax({
+		url: "/empltree/getDeptEmpl?deptCode=" + deptCode,
+		async : false,
+		method : "GET",
+		dataType : "json"		
+	});
+	getEmpl.done(function(data){
+		addEmpls(data);
+	});
+	
+	var getDept = $.ajax({
+		url: "/empltree/getdepts?deptCode=" + deptCode,
+		method : "GET",
+		dataType : "json"
+	});
+	getDept.done(function(data){
+		addDepts(data);
+	});
+}
+
+// 사원 추가하기~~
+function addEmpls(empls) {
+	for(let i=0; i<empls.length; i++){
+		let empl = empls[i];
+		let elem = generateEmplElem(empl);
+		document.getElementById("dept-"+empl.deptCode).innerHTML += elem;
+	}
+}
+
+var deptNm = "";
+// 사원 정보 element 만들기
+function generateEmplElem(empl) {
+	
+	var box1 = "<li class='sidebar-item'><div class='organ-tree-empl justify-content-between'";
+	var box2 = "' ><span class='d-flex justify-content-center align-items-center round-20 rounded-circle'><img class='yen-inner-imag rounded-circle' src='";
+	var box3 = "</span><div><span class='tree-ad-icon'></span></div></div></li>";
+	
+	var elem = box1;
+	elem += "data-empl-no='" + empl.emplNo +"' data-empl-nm='" + empl.emplNm + "' data-dept-nm='" + deptNm + "' data-clsf-nm='" + empl.clsfNm;
+	elem += box2;
+	elem += "${pageContext.request.contextPath}/resources/vendor/images/profile/user-1.jpg";
+	elem += "'></span><span class='fw-semibold'>";
+	elem += empl.emplNm;
+	elem += "</span><span class='col'>";
+	elem += empl.clsfNm;
+	elem += box3;
+	return elem;	
+}
+
+// 부서 추가하기~~
+function addDepts(depts){
+	for(let i=0; i<depts.length; i++){
+		let dept = depts[i];
+		let elem = generateDeptElem(dept);
+		document.getElementById("dept-"+dept.upperDeptCode).innerHTML += elem;
+		makeTree(dept.deptCode);
+	}
+}
+
+// 부서 element 만들기
+function generateDeptElem(dept){
+	deptNm = dept.deptNm;
+	var elem = "<li class='sidebar-item'";
+	elem += "><a class='sidebar-link has-arrow' href='javascript:void(0)' aria-expanded='false'><h5 class='hide-menu'>";
+	elem += dept.deptNm;
+	elem += "</h5></a><ul id='dept-" + dept.deptCode;
+	elem += "' aria-expanded='false' class='collapse'></ul></li>";
+	return elem;
+}
+
+</script>

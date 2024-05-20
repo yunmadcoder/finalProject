@@ -1,0 +1,517 @@
+$(function () {
+    function checkall(clickchk, relChkbox) {
+        var checker = $("#" + clickchk);
+        var multichk = $("." + relChkbox);
+    
+        checker.click(function () {
+            multichk.prop("checked", $(this).prop("checked"));
+            $(".show-btn").toggle();
+        });
+    }
+    
+    checkall("contact-check-all", "contact-chkbox");
+    
+    $("#input-search").on("keyup", function () {
+        var rex = new RegExp($(this).val(), "i");
+        $(".search-table .search-items:not(.header-item)").hide();
+        $(".search-table .search-items:not(.header-item)")
+            .filter(function () {
+                return rex.test($(this).text());
+            })
+            .show();
+    });
+    
+    $("#btn-add-contact").on("click", function (event) {
+        $("#addContactModal #btn-add").show();
+        $("#addContactModal #btn-edit").hide();
+        $("#addContactModal").modal("show");
+    });
+    
+    function deleteContact() {
+        $(".delete").on("click", function (event) {
+            event.preventDefault();
+            /* Act on the event */
+            $(this).parents(".search-items").remove();
+        });
+    }
+    
+    function addContact() {
+        $("#btn-add").click(function () {
+            var getParent = $(this).parents(".modal-content");
+    
+            var $_name = getParent.find("#c-name");
+            var $_company = getParent.find("#c-company");
+            var $_department = getParent.find("#c-department");
+            var $_position = getParent.find("#c-position");
+            var $_email = getParent.find("#c-email");
+            var $_phone = getParent.find("#c-phone");
+            var $_memo = getParent.find("#c-memo");
+    
+            var $_getValidationField = document.getElementsByClassName("validation-text");
+            var reg = /^.+@[^\.].*\.[a-z]{2,}$/;
+            var phoneReg = /^(?:\d|\-)*$/;
+    
+			var $_nameValue = $_name.val();
+			var $_companyValue = $_company.val();
+			var $_departmentValue = $_department.val();
+			var $_positionValue = $_position.val();
+			var $_emailValue = $_email.val();
+			var $_phoneValue = $_phone.val();
+			var $_memoValue = $_memo.val();
+    		var imagePath = "../resources/vendor/images/profile/user-2.jpg";
+            
+            if ($_nameValue == "") {
+                $_getValidationField[0].innerHTML = "이름을 입력하세요.";
+                $_getValidationField[0].style.display = "block";
+            } else {
+                $_getValidationField[0].style.display = "none";
+            }
+    
+            if ($_emailValue == "") {
+                $_getValidationField[1].innerHTML = "이메일을 입력하세요.";
+                $_getValidationField[1].style.display = "block";
+            } else if (reg.test($_emailValue) == false) {
+                $_getValidationField[1].innerHTML = "유효하지 않은 이메일 형식입니다.";
+                $_getValidationField[1].style.display = "block";
+            } else {
+                $_getValidationField[1].style.display = "none";
+            }
+    
+			if ($_phoneValue == "") {
+				$_getValidationField[2].innerHTML = "휴대폰 번호를 입력하세요.";
+				$_getValidationField[2].style.display = "block";
+			} else if (phoneReg.test($_phoneValue) == false) {
+				$_getValidationField[2].innerHTML = "숫자나 '-'만 입력해주세요.";
+				$_getValidationField[2].style.display = "block";
+			} else {
+				$_getValidationField[2].style.display = "none";
+			}
+			
+    
+            if (
+	          $_nameValue == "" ||
+	          $_emailValue == "" ||
+	          reg.test($_emailValue) == false ||
+	          $_phoneValue == "" ||
+	          phoneReg.test($_phoneValue) == false
+	        ) {
+	          return false;
+	        }
+    
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, "0");
+            var mm = String(today.getMonth()); //January is 0!
+            var time = String(today.getTime());
+            var yyyy = today.getFullYear();
+            var monthNames = [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ];
+            today = dd + " " + monthNames[mm] + " " + yyyy;
+            var cdate = dd + mm + time;
+    
+		$html =
+		    '<tr class="search-items">' +
+		    '<td>' +
+		    '<div class="n-chk align-self-center text-center">' +
+		    '<div class="form-check">' +
+		    '<input type="checkbox" class="form-check-input contact-chkbox primary" id="' +
+		    cdate +
+		    '">' +
+		    '<label class="form-check-label" for="' +
+		    cdate +
+		    '"></label>' +
+		    '</div>' +
+		    '</div>' +
+		    '</td>' +
+		    '<td>' +
+		    '<div class="d-flex align-items-center">' +
+		    '<img src="' + imagePath + '" alt="avatar" class="rounded-circle" width="35">' +
+		    '<div class="ms-3">' +
+		    '<div class="user-meta-info">' +
+		    '<h6 class="user-name mb-0" data-name="' +
+		    $_nameValue +
+		    '">' +
+		    $_nameValue +
+		    '</h6>' +
+		    '</div>' +
+		    '</div>' +
+		    '</div>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-company" data-company="' +
+		    $_companyValue +
+		    '">' +
+		    $_companyValue +
+		    '</span>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-department" data-dept="' +
+		    $_departmentValue +
+		    '">' +
+		    $_departmentValue +
+		    '</span>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-position" data-position="' +
+		    $_positionValue +
+		    '">' +
+		    $_positionValue +
+		    '</span>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-email-addr" data-email="' +
+		    $_emailValue +
+		    '">' +
+		    $_emailValue +
+		    '</span>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-ph-no" data-phone="' +
+		    $_phoneValue +
+		    '">' +
+		    $_phoneValue +
+		    '</span>' +
+		    '</td>' +
+		    '<td>' +
+		    '<span class="usr-memo" data-memo="' +
+		    $_memoValue +
+		    '">' +
+		    $_memoValue +
+		    '</span>' +
+		    '</td>' +
+		    '</tr>';
+    
+            $(".search-table > tbody >tr:first").before($html);
+            $("#addContactModal").modal("hide");
+    
+            var $_setNameValueEmpty = $_name.val("");
+            var $_setEmailValueEmpty = $_email.val("");
+            var $_setCompanyValueEmpty = $_company.val("");
+            var $_setDepartmentValueEmpty = $_department.val("");
+            var $_setPositionValueEmpty = $_position.val("");
+            var $_setPhoneValueEmpty = $_phone.val("");
+            var $_setMemoValueEmpty = $_memo.val("");
+    
+            deleteContact();
+            editContact();
+            checkall("contact-check-all", "contact-chkbox");
+        });
+    }
+    
+    $("#addContactModal").on("hidden.bs.modal", function (e) {
+        var $_name = document.getElementById("c-name");
+        var $_email = document.getElementById("c-email");
+        var $_company = document.getElementById("c-company");
+        var $_department = document.getElementById("c-department");
+        var $_position = document.getElementById("c-position");
+        var $_phone = document.getElementById("c-phone");
+        var $_memo = document.getElementById("c-memo");
+        var $_getValidationField = document.getElementsByClassName("validation-text");
+    
+        var $_setNameValueEmpty = ($_name.value = "");
+        var $_setEmailValueEmpty = ($_email.value = "");
+        var $_setCompanyValueEmpty = ($_company.value = "");
+        var $_setDepartmentValueEmpty = ($_department.value = "");
+        var $_setPositionValueEmpty = ($_position.value = "");
+        var $_setPhoneValueEmpty = ($_phone.value = "");
+        var $_setMemoValueEmpty = ($_memo.value = "");
+    
+        for (var i = 0; i < $_getValidationField.length; i++) {
+            e.preventDefault();
+            $_getValidationField[i].style.display = "none";
+        }
+    });
+    
+    function editContact() {
+        $(".edit").on("click", function (event) {
+            $("#addContactModal #btn-add").hide();
+            $("#addContactModal #btn-edit").show();
+    
+            // Get Parents
+            var getParentItem = $(this).parents(".search-items");
+            var getModal = $("#addContactModal");
+    
+            // Get List Item Fields
+            var $_name = getParentItem.find(".user-name");
+            var $_email = getParentItem.find(".usr-email-addr");
+            var $_company = getParentItem.find(".usr-company");
+            var $_department = getParentItem.find(".usr-department");
+            var $_position = getParentItem.find(".usr-position");
+            var $_phone = getParentItem.find(".usr-ph-no");
+            var $_memo = getParentItem.find(".usr-memo");
+    
+            // Get Attributes
+            var $_nameAttrValue = $_name.attr("data-name");
+            var $_emailAttrValue = $_email.attr("data-email");
+            var $_companyAttrValue = $_company.attr("data-company");
+            var $_departmentAttrValue = $_department.attr("data-department");
+            var $_positionAttrValue = $_position.attr("data-position");
+            var $_phoneAttrValue = $_phone.attr("data-phone");
+            var $_memoAttrValue = $_memo.attr("data-memo");
+    
+            // Get Modal Attributes
+            var $_getModalNameInput = getModal.find("#c-name");
+            var $_getModalEmailInput = getModal.find("#c-email");
+            var $_getModalCompanyInput = getModal.find("#c-company");
+            var $_getModalDepartmentInput = getModal.find("#c-department");
+            var $_getModalPositionInput = getModal.find("#c-position");
+            var $_getModalPhoneInput = getModal.find("#c-phone");
+            var $_getModalMemoInput = getModal.find("#c-memo");
+   
+            // Set Modal Field's Value
+            var $_setModalNameValue = $_getModalNameInput.val($_nameAttrValue);
+            var $_setModalEmailValue = $_getModalEmailInput.val($_emailAttrValue);
+            var $_setModalCompanyValue = $_getModalCompanyInput.val($_companyAttrValue);
+            var $_setModalDepartmentValue = $_getModalDepartmentInput.val($_departmentAttrValue);
+            var $_setModalPositionValue = $_getModalPositionInput.val($_positionAttrValue);
+            var $_setModalPhoneValue = $_getModalPhoneInput.val($_phoneAttrValue);
+            var $_setModalMemoValue = $_getModalMemoInput.val($_memoAttrValue);
+    
+            $("#addContactModal").modal("show");
+    
+            $("#btn-edit").click(function () {
+                var getParent = $(this).parents(".modal-content");
+    
+                var $_getInputName = getParent.find("#c-name");
+                var $_getInputEmail = getParent.find("#c-email");
+                var $_getInputCompany = getParent.find("#c-company");
+                var $_getInputDepartment = getParent.find("#c-department");
+                var $_getInputPosition = getParent.find("#c-position");
+                var $_getInputPhone = getParent.find("#c-phone");
+                var $_getInputMemo = getParent.find("#c-memo");
+    
+                var $_nameValue = $_getInputName.val();
+                var $_emailValue = $_getInputEmail.val();
+                var $_companyValue = $_getInputCompany.val();
+                var $_departmentValue = $_getInputDepartment.val();
+                var $_positionValue = $_getInputPosition.val();
+                var $_phoneValue = $_getInputPhone.val();
+                var $_memoValue = $_getInputMemo.val();
+    
+                var setUpdatedNameValue = $_name.text($_nameValue);
+                var setUpdatedEmailValue = $_email.text($_emailValue);
+                var setUpdatedCompanyValue = $_company.text($_companyValue);
+                var setUpdatedDepartmentValue = $_department.text($_departmentValue);
+                var setUpdatedPositionValue = $_position.text($_positionValue);
+                var setUpdatedPhoneValue = $_phone.text($_phoneValue);
+                var setUpdatedMemoValue = $_memo.text($_memoValue);
+    
+                var setUpdatedAttrNameValue = $_name.attr("data-name", $_nameValue);
+                var setUpdatedAttrEmailValue = $_email.attr("data-email", $_emailValue);
+                var setUpdatedAttrCompanyValue = $_company.attr("data-company", $_companyValue);
+                var setUpdatedAttrDepartmentValue = $_department.attr("data-department", $_departmentValue);
+                var setUpdatedAttrPositionValue = $_position.attr("data-position", $_positionValue);
+                var setUpdatedAttrPhoneValue = $_phone.attr("data-phone", $_phoneValue);
+                var setUpdatedAttrMemoValue = $_memo.attr("data-memo", $_memoValue);
+    
+                $("#addContactModal").modal("hide");
+            });
+        });
+    }
+    
+    $(".delete-multiple").on("click", function () {
+        var inboxCheckboxParents = $(".contact-chkbox:checked").parents(
+            ".search-items"
+        );
+        inboxCheckboxParents.remove();
+    });
+    
+    deleteContact();
+    addContact();
+    editContact();
+});
+  
+// Validation Process
+  
+var $_getValidationField = document.getElementsByClassName("validation-text");
+var reg = /^.+@[^\.].*\.[a-z]{2,}$/;
+var phoneReg = /^\d{3}-\d{4}-\d{4}$/;
+  
+getNameInput = document.getElementById("c-name");
+  
+getNameInput.addEventListener("input", function () {
+    getNameInputValue = this.value;
+  
+    if (getNameInputValue == "") {
+        $_getValidationField[0].innerHTML = "이름을 입력하세요.";
+        $_getValidationField[0].style.display = "block";
+    } else {
+        $_getValidationField[0].style.display = "none";
+    }
+});
+  
+getEmailInput = document.getElementById("c-email");
+  
+getEmailInput.addEventListener("input", function () {
+    getEmailInputValue = this.value;
+  
+    if (getEmailInputValue == "") {
+        $_getValidationField[1].innerHTML = "이메일을 입력하세요.";
+        $_getValidationField[1].style.display = "block";
+    } else if (reg.test(getEmailInputValue) == false) {
+        $_getValidationField[1].innerHTML = "유효하지 않은 이메일 형식입니다.";
+        $_getValidationField[1].style.display = "block";
+    } else {
+        $_getValidationField[1].style.display = "none";
+    }
+});
+  
+getPhoneInput = document.getElementById("c-phone");
+  
+getPhoneInput.addEventListener("input", function () {
+    getPhoneInputValue = this.value;
+  
+    if (getPhoneInputValue == "") {
+        $_getValidationField[2].innerHTML = "휴대폰 번호를 입력하세요.";
+        $_getValidationField[2].style.display = "block";
+    } else if (phoneReg.test(getPhoneInputValue) == false) {
+        $_getValidationField[2].innerHTML = "유효하지 않은 휴대폰 번호 형식입니다. (예: 010-1234-1234)";
+        $_getValidationField[2].style.display = "block";
+    } else {
+        $_getValidationField[2].style.display = "none";
+    }
+});
+
+
+function modifyAddress() {
+		var checkedItems = $('.contact-chkbox:checked');
+		if (checkedItems.length === 1) {
+			// 한 명을 체크한 경우 수정 가능하게
+			isEditMode = true; // 수정 모드로 변경
+			addContactTitle.text('주소록 수정'); // 모달 제목을 "주소록 수정"으로 변경
+
+			// 선택한 체크박스의 값을 가져와서 수정 폼에 채워 넣기
+			var selectedRow = checkedItems.closest('tr');
+			var name = selectedRow.find('.user-name').data('name');
+			var company = selectedRow.find('.usr-company').data('company');
+			var department = selectedRow.find('.usr-department').data('dept');
+			var position = selectedRow.find('.usr-position').data('position');
+			var email = selectedRow.find('.usr-email-addr').data('email');
+			var phone = selectedRow.find('.usr-ph-no').data('phone');
+			var memo = selectedRow.find('.usr-memo').data('memo');
+
+			// 수정 폼에 값들을 채워 넣기
+			$('#c-name').val(name);
+			$('#c-company').val(company);
+			$('#c-department').val(department);
+			$('#c-position').val(position);
+			$('#c-email').val(email);
+			$('#c-phone').val(phone);
+			$('#c-memo').val(memo);
+
+			$('#addContactModal').modal('show'); // 모달 열기
+		} else if (checkedItems.length > 1) {
+			// 두 명 이상을 체크한 경우
+			 Swal.fire({
+					html: '<span class="h4" style="font-size: 1.05em;">수정은 한 번에 한 명의 항목만 가능합니다.</span>',
+				    icon: 'warning',
+				    confirmButtonText: '확인'
+				  });
+		} else {
+			// 체크된 항목이 없는 경우
+			Swal.fire('수정할 항목을 선택해주세요.', '', 'warning');
+		}
+
+	}
+	
+function EmplEditAjax() {
+		// 수정 내용 확인을 위한 SweetAlert 창 표시
+	    Swal.fire({
+	        title: '수정하시겠습니까?',
+	        icon: 'question',
+	        showCancelButton: true,
+	        confirmButtonText: '수정',
+	        cancelButtonText: '취소',
+	    }).then((result) => {
+	        // 사용자가 확인을 누른 경우에만 AJAX 요청 보내기
+	        if (result.isConfirmed) {
+	            var adbkNo = $('.contact-chkbox:checked').closest('tr').find('input[type="hidden"]').val();
+
+	            // 폼 데이터를 가져옴
+	            var formData = {
+	                adbkEmail: $('#c-email').val(),
+	                adbkTelno: $('#c-phone').val(),
+	                adbkMemo: $('#c-memo').val(),
+	                adbkNo: adbkNo
+	            };
+
+	            // AJAX를 통해 서버로 폼 데이터 전송
+	            $.ajax({
+	                beforeSend: function(xhr) {
+	                    xhr.setRequestHeader(header, token);
+	                },
+	                type: 'POST',
+	                url: '/address/updateEmplAddress',
+	                data: JSON.stringify(formData),
+	                contentType: 'application/json;charset=utf-8',
+	                success: function(response) {
+	                    Swal.fire('수정 성공!', '', 'success').then(() => {
+	                        window.location.reload();
+	                    });
+	                },
+	                error: function(xhr, status, error) {
+	                    console.error(xhr.responseText);
+	                    Swal.fire('오류 발생', '수정에 실패하였습니다.', 'error');
+	                }
+	            });
+	        }
+	    });
+	}
+function setupEmplModalEvents() {
+	    // 모달이 열릴 때마다 실행되는 이벤트
+	    $('#addContactModal').on('show.bs.modal', function() {
+	        addContactTitle.text('외부사원 주소록 등록');
+	        // 수정 모드인 경우
+	        if (isEditMode) {
+	            addContactTitle.text('주소록 수정');
+	            $('#btn-add').hide();
+	            $('#btn-edit').show();
+	            // 회사 이름 필드를 readonly로 설정
+	            $('#c-name').prop('readonly', true);
+	            $('#c-company').prop('readonly', true);
+	            $('#c-department').prop('readonly', true);
+	            $('#c-position').prop('readonly', true);
+	        } else { // 추가 모드인 경우
+	            $('#btn-add').show();
+	            $('#btn-edit').hide();
+	            // 회사 이름 필드의 readonly 속성을 제거하여 수정 가능하도록 함
+	            $('#c-company').prop('readonly', false);
+	        }
+	    });
+
+	    // 모달이 닫힐 때마다
+	    $('#addContactModal').on('hidden.bs.modal', function() {
+	        $('#btn-add').show();
+	        $('#btn-edit').hide();
+	        // 회사 이름 필드의 readonly 속성을 제거하여 수정 가능하도록 함
+	        $('#c-company').prop('readonly', false);
+	        // 수정 모드 해제
+	        isEditMode = false;
+	    });
+	}
+	
+$("#pslGrpDiv").on("keyup", "#input-search", function () {
+    var rex = new RegExp($(this).val(), "i");
+    $(".search-table .search-items:not(.header-item)").hide();
+    $(".search-table .search-items:not(.header-item)")
+        .filter(function () {
+            return rex.test($(this).text());
+        })
+        .show();
+});	        
+	
+$(document).on("click", "#contact-check-all", function () {
+    $(".contact-chkbox").prop("checked", $(this).prop("checked"));
+    $(".show-btn").toggle();
+}); 

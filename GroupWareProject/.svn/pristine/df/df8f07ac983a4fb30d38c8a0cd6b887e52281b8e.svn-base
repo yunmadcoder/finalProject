@@ -1,0 +1,20 @@
+package kr.or.ddit.groupware.vo;
+
+import java.sql.Date;
+
+import lombok.Data;
+@Data
+public class MtgRoomReservVO {
+	private int resveNo;                  //예약번호 n.n
+	private int emplNo;					//예악한사원  n.n
+	private int mtngRoomNo;				//회의실번호  n.n
+	private Date resveRgsde;			//최초등록일시
+	private Date resveBeginDt;		       //시작시간
+	private Date resveEndDt;		        //종료시간
+	private String resveCn;			         //예약내용
+	
+	
+	
+	
+	
+}

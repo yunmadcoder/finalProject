@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.service.rental;
+
+/**
+ * 예약 및 대여 서비스 인터페이스
+ * @author <strong>민경선</strong>
+ * @version 1.0
+ * @see IRentalService
+ */
+public interface IRentalService {
+
+}

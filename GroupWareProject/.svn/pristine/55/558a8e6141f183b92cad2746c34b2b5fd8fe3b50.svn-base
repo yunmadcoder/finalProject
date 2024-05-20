@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.memo.IMemoMapper">
+	
+	<insert id="addMemo" parameterType="memoVO" useGeneratedKeys="true">
+	
+		<selectKey keyProperty="memoNo" resultType="int" order="BEFORE">
+			select seq_memo.nextval from dual
+		</selectKey>
+		INSERT INTO MEMO(
+		  MEMO_NO   
+		 ,EMPL_NO   
+		 ,MEMO_NM   
+		 ,MEMO_CN   
+		 ,MEMO_IMPRTNC_YN 
+		 ,MEMO_DEL_YN )
+		 VALUES(
+		 #{memoNo}
+		 ,#{emplNo}
+		 ,#{memoNm}
+		 ,#{memoCn}
+		 ,#{memoImprtncYn}
+		 ,#{memoDelYn}
+ 		 )
+	</insert>
+
+</mapper>

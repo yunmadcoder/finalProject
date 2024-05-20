@@ -1,0 +1,39 @@
+package kr.or.ddit.groupware.service.project;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.groupware.mapper.project.IProjectMapper;
+import kr.or.ddit.groupware.vo.ProjectVO;
+
+/**
+ * 프로젝트 서비스 구현체
+ * @author <strong>권예은</strong>
+ * @version 1.0
+ * @see ProjectServiceImpl
+ */
+@Service
+public class ProjectServiceImpl implements IProjectService {
+
+	@Inject
+	IProjectMapper projectMapper;
+	
+	@Override
+	public List<ProjectVO> selectProjectListByEmplNo(int emplNo) {
+		return projectMapper.selectProjectListByEmplNo(emplNo);
+	}
+
+	@Override
+	public List<ProjectVO> selectAvailableProjectListByEmplNo(int emplNo) {
+		return projectMapper.selectAvailableProjectListByEmplNo(emplNo);
+	}
+
+	@Override
+	public List<Integer> selectProjectParticipant(int projectNo) {
+		return projectMapper.selectProjectParticipant(projectNo);
+	}
+
+}

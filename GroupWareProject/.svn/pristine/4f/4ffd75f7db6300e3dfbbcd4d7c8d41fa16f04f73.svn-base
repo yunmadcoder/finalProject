@@ -1,0 +1,198 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<style>
+
+.bg-danger {
+    background-color: #ff6b6b;
+}
+.text-light {
+    color: #ffffff !important;
+}
+.dt-buttons {
+     margin-top: 20px; /* Adjust the value as needed for more or less space */
+     display: inline-block; /* Makes the div only as wide as its content */
+ }    
+
+</style>
+<div class="widget-content searchable-container list">
+<div class="container-fluid">
+	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-9">
+					<h4 class="fw-semibold mb-8">대여승인관리</h4>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a class="text-muted text-decoration-none" href="../main/index.html">Home</a></li>
+							<li class="breadcrumb-item" aria-current="page">시설물관리</li>
+							<li class="breadcrumb-item" aria-current="page">대여승인관리</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-3">
+					<div class="text-center mb-n5">
+						<img src="../assets/images/breadcrumb/ChatBc.png" alt="" class="img-fluid mb-n4">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="datatables">
+		<!-- File export -->
+		<div class="row">
+			<div class="col-12">
+				<!-- start File export -->
+				<div class="card">
+					<div class="card-body">
+						<div class="mb-2">
+							<h4 class="mb-0">대여 신청 목록</h4>
+							<br>
+						</div>
+						<div class="table-responsive">
+							<div id="file_export_wrapper" class="dataTables_wrapper">
+								<!--엑셀 다운로드 옵션  -->
+								<div class="dt-buttons">
+									<button class="dt-button buttons-excel buttons-html5 btn btn-primary mr-1" tabindex="0" aria-controls="file_export" type="button">
+										<span>Excel 다운로드</span>
+									</button>
+								
+								</div>
+								<br>
+								<!--대여신청 목록 검색  -->
+								<div id="file_export_filter" class="dataTables_filter">
+								     <style>
+								        #file_export_filter {
+								            display: flex;
+								            justify-content: flex-end; /* Aligns children to the right */
+								        }
+								        #ReservListId > div {
+								            display: flex;
+								            align-items: center; /* Vertically centers the input and button if needed */
+								        }
+								        #ReservListId input[type="search"] {
+								            margin-right: 10px; /* Adds spacing between the input and the button */
+								        }
+								    </style>
+									<form action="" method="post"  id="ReservListId">
+										<div>
+											<input type="search" name="searchWord" value="${searchWord }" id="searchForm"  class="" placeholder="검색어를 입력해주세요" aria-controls="file_export">
+											<button type="submit" class="btn btn-default rounded-0">
+												<i class="fas fa-search"></i>검색
+											</button>
+										</div>
+										<input type="hidden" name="page" id="page" />
+										<sec:csrfInput />
+									</form>
+								</div>
+								<table id="file_export" class="table border w-100 table-striped table-bordered display text-nowrap dataTable" aria-describedby="file_export_info">
+									<thead>
+										<!-- start row -->
+										<tr>
+											<th class="sorting sorting_asc" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 163.854px;">시설명</th>
+											<th class="sorting" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 269.979px;">시설번호</th>
+											<th class="sorting" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: 122.396px;">대여신청번호</th>
+											<th class="sorting" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: 49.9167px;">대여신청시간</th>
+											<th class="sorting" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-label="Start date: activate to sort column ascending" style="width: 113.292px;">대여내용</th>
+											<th class="sorting" tabindex="0" aria-controls="file_export" rowspan="1" colspan="1" aria-label="Salary: activate to sort column ascending" style="width: 108.562px;">상태</th>
+										</tr>
+										<!-- end row -->
+									</thead>
+									<tbody>
+										<!--startRow  -->
+										<c:set value="${pagingVO.dataList }" var="rentalList" />
+										<c:choose>
+											<c:when test="${empty rentalList }">
+												<tr>
+													<td colspan="5">조회하신 예약내역이 존재하지 않습니다</td>
+												</tr>
+											</c:when>
+											<c:otherwise>
+												<c:forEach items="${rentalList }" var="rentalVO">
+													<tr class="odd">
+														<td class="sorting_1">${rentalVO.itemNm }</td>
+														<td>${rentalVO.eqpnmCd }</td>
+														<td>${rentalVO.erntNo }</td>
+														<td>
+															<span class="usr-location"> <fmt:formatDate value="${rentalVO.erntBeginDt}" pattern="yyyy/MM/dd HH:mm" /> ~ <fmt:formatDate value="${rentalVO.erntEndDt}" pattern="yyyy/MM/dd HH:mm" />
+															</span>
+														</td>
+														<td>${rentalVO.erntResn }</td>
+														<td>
+															<div class="action-btn">
+																<a href="javascript:void(0);" onclick="approveRental(${rentalVO.erntNo})" class="text-primary edit">
+																	<span class="badge rounded-pill bg-primary-subtle text-primary fw-semibold fs-2">승인</span>
+																</a>
+																<a href="javascript:void(0);" onclick="rejectRental(${rentalVO.erntNo})" class="text-danger edit">
+																    <span class="badge rounded-pill bg-danger text-light fw-semibold fs-2">반려</span>
+																</a>
+															</div>
+														</td>
+													</tr>
+												</c:forEach>
+											</c:otherwise>
+										</c:choose>
+
+									</tbody>
+
+								</table>
+								<div class="dataTables_info" id="file_export_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div>
+								<br>
+								<nav style="margin-top: 20px;" aria-label="Page navigation example" id="pagingArea">${pagingVO.pagingHTML}</nav>
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- end File export -->
+			</div>
+		</div>
+	</div>
+</div>	
+</div>
+<script type="text/javascript">
+//페이징 처리
+$(function() {
+	var ReservListId = $("#ReservListId");
+	var pagingArea = $("#pagingArea");
+
+	pagingArea.on("click", "a", function(event) {
+		event.preventDefault();
+		var pageNo = $(this).data("page");
+		ReservListId.find("#page").val(pageNo);
+		ReservListId.submit();
+	});
+});
+
+
+function approveRental(erntNo) {
+    $.ajax({
+        url: '/admin/rental/approveRental',
+        type: 'POST',
+        data: { erntNo: erntNo },
+        success: function(response) {
+            alert('대여신청 승인되었습니다.');
+            location.reload(); // Reload page to update the list
+        },
+        error: function(error) {
+            alert('Error updating approval status.');
+        }
+    });
+} 
+    function rejectRental(erntNo) {
+        $.ajax({
+            url: '/admin/rental/rejectRental',
+            type: 'POST',
+            data: { erntNo: erntNo },
+            success: function(response) {
+                alert('대여 신청 반려되었습니다.');
+                location.reload(); // Reload page to update the list
+            },
+            error: function(error) {
+                alert('Error updating approval status.');
+            }
+        });
+    }
+</script>

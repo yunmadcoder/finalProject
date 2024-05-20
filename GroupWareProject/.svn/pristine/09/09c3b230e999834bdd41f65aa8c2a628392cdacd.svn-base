@@ -1,0 +1,16 @@
+package kr.or.ddit.groupware.mapper.rental;
+
+import kr.or.ddit.groupware.vo.RentalVO;
+/**
+ * 예약 및 대여 SQL Mapper
+ * @author 민경선
+ * @version 1.0
+ * @see IRentalMapper
+ */
+public interface IRentalMapper {
+
+	int rentVehicle(RentalVO rentalVO);
+
+	int rentSupplies(RentalVO rentalVO);
+
+}

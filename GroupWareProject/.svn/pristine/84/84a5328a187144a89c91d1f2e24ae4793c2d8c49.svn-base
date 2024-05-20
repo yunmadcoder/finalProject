@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.service.documents.IDocumentsMapper">
+	<select id="selectDocumentsList" resultType="documentsVO">
+		select 
+			doc_no
+			, doc_nm
+			, doc_cn
+            , doc_type_code
+			, cmmn_code_name1 as doc_type_nm
+			, d.use_yn
+			, doc_register
+			, doc_rgdde
+			, doc_updusr
+			, doc_updde
+		from documents d
+        left outer join comm_code c on (c.cmmn_code = d.doc_type_code)
+	</select>
+</mapper>

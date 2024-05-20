@@ -1,0 +1,225 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/project/css/source/apexcharts.min.css">
+<style>
+.content-header-t {
+	color: #888;
+	letter-spacing: -0.5px;
+	margin: 0 4px;
+	font-size: 13px;
+	margin: 0 4px;
+}
+
+span.title {
+	padding-left: 0px;
+	margin-bottom: 16px;
+	font-weight: 600;
+	font-size: 18px;
+}
+
+#tbl tbody th {
+	color: #888;
+	font-weight: 600;
+}
+
+[data-list] li a:hover {
+	color: #6d82a6 !important;
+}
+</style>
+<div class="container positon-relative pt-4">
+	<div>
+		<span class="content-header-t">기본 관리</span>
+		<h4 style="line-height: 40px;">서비스 정보</h4>
+	</div>
+	<div class="p-5 text-center bg-white rounded-3 w-100">
+		<div class="w-100">
+			<span class="float-start title">기본 정보</span>
+		</div>
+		<div class="mt-5">
+			<table class="table table-responsive table-borderless bg-light" id="tbl">
+				<tbody>
+					<tr>
+						<th>사이트명</th>
+						<td>ThinkLink</td>
+						<th>담당자</th>
+						<td>${employee.emplNm }</td>
+					</tr>
+					<tr>
+						<th>총 계정수</th>
+						<td>${employeeCountList[0] }</td>
+						<th>활동 계정</th>
+						<td>${employeeCountList[1] }</td>
+					</tr>
+					<tr>
+						<th colspan="2">도입일자</th>
+						<td colspan="2">2024.04.26(금) 20:12</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="container positon-relative mt-4">
+	<div class="card bg-white">
+		<div class="card-body p-5 text-center overflow-hidden">
+			<div class="row">
+				<div class="col-lg-6 col-md-3">
+					<h2 class="float-start">부서 별 인원 통계</h2>
+					<hr />
+					<div id="charts"></div>
+				</div>
+				<div class="col-lg-6 col-md-3">
+					<h2 class="float-start">차트2</h2>
+					<div id="charts2">
+					
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="${pageContext.request.contextPath }/resources/project/js/source/apexcharts.min.js"></script>
+<script>
+let employeeAge = JSON.parse('${employeeAgeList}');
+let employeeAgeGroup = JSON.parse('${employeeAgeGroupList}');
+let employeeDept = JSON.parse('${employeeDeptList}');
+
+$(function() {
+	createDeptChartValue();
+	createAgeChartValue();
+});
+
+function createDeptChartValue() {
+	let count = [];
+	let dept = [];
+	for(let i = 0; i < employeeDept.length; i++) {
+		count.push(employeeDept[i].COUNT);
+		dept.push(employeeDept[i].DEPT_NM);
+	}
+	
+	var options = {
+		series: [{
+		   name: '인원 수',
+		   data: count
+		 }],
+		 chart: {
+		   type: 'bar',
+		   height: 350
+		 },
+		 plotOptions: {
+		   bar: {
+		     horizontal: false,
+		     distributed: true
+		   }
+		 },
+		 xaxis: {
+		   categories: dept
+		},
+		legend: {
+			show: true,
+		    onItemClick: {
+		        toggleDataSeries: true
+		    },
+		    onItemHover: {
+		        highlightDataSeries: true
+		    },
+			position: 'top'
+		}
+	};
+
+		var chart = new ApexCharts(document.querySelector("#charts"), options);
+		chart.render();
+}
+
+function createAgeChartValue() {
+	let birth = [];
+	let age = [];
+	let count = [];
+	for(let i = 0; i < employeeAge.length; i++) {
+		birth.push(employeeAge[i].BIRTH_YEAR);
+		age.push(employeeAge[i].AGE);
+		count.push(employeeAge[i].COUNT)
+	}
+	
+	var options = {
+		    series: [{
+		        name: 'Female',
+		        data: [
+		            { x: '10s', y: 45 },
+		            { x: '20s', y: 60 },
+		            { x: '30s', y: 70 },
+		            { x: '40s', y: 80 },
+		            { x: '50s', y: 90 }
+		        ]
+		    }, {
+		        name: 'Male',
+		        data: [
+		            { x: '10s', y: -30 },
+		            { x: '20s', y: -40 },
+		            { x: '30s', y: -35 },
+		            { x: '40s', y: -50 },
+		            { x: '50s', y: -55 }
+		        ]
+		    }],
+		    chart: {
+		        type: 'bar',
+		        height: 350,
+		        toolbar: {
+		            show: true
+		        }
+		    },
+		    plotOptions: {
+		        bar: {
+		            horizontal: true,
+		            distributed: true,
+		            dataLabels: {
+		                position: 'top',
+		            },
+		        }
+		    },
+		    dataLabels: {
+		        enabled: true,
+		        formatter: function (val) {
+		            return Math.abs(val); // 데이터 라벨에서 절대값을 사용하여 양수로 표시
+		        },
+		        offsetX: -6,
+		        style: {
+		            fontSize: '12px',
+		            colors: ['#fff']
+		        }
+		    },
+		    xaxis: {
+		        categories: ['10s', '20s', '30s', '40s', '50s'],
+		    },
+		    yaxis: {
+		        labels: {
+		            formatter: function (val) {
+		                return Math.abs(val); // y축 라벨에서도 절대값을 사용하여 양수로 표시
+		            }
+		        }
+		    },
+		    tooltip: {
+		        y: {
+		            formatter: function (val) {
+		                return Math.abs(val) + 'k'; // 툴팁에서 절대값을 사용하여 양수로 표시
+		            }
+		        }
+		    },
+		    grid: {
+		        xaxis: {
+		            lines: {
+		                show: true
+		            }
+		        }
+		    },
+		    legend: {
+		        show: true
+		    }
+		};
+
+		var chart = new ApexCharts(document.querySelector("#charts2"), options);
+		chart.render();
+
+}
+</script>

@@ -1,0 +1,25 @@
+package kr.or.ddit.groupware.service.notification;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.NotificationVO;
+
+/**
+ * 알림 서비스 인터페이스
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see INotificationService
+ */
+public interface INotificationService {
+
+	List<NotificationVO> selectNotiList(NotificationVO notiVO);
+
+	List<NotificationVO> selectNotReadNotiList(NotificationVO notiVO);
+
+	List<NotificationVO> selectNotReadNotiFive(NotificationVO notiVO);
+
+	Result notiRead(NotificationVO notificationVO);
+
+	Result notiDelete(NotificationVO notificationVO);
+}

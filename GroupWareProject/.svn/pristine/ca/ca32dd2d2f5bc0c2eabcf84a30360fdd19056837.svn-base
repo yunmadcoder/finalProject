@@ -1,0 +1,29 @@
+package kr.or.ddit.groupware.controller.answer;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.groupware.service.answer.IAnswerService;
+import kr.or.ddit.groupware.vo.AnswerVO;
+
+@RequestMapping("/answer")
+@Controller
+public class AnswerController {
+	
+	@Inject
+	private IAnswerService answerService;
+	
+	@PostMapping("/insert")
+	public int insertAnswer(@RequestBody AnswerVO answerVO) {
+		int result = answerService.insertAnswer(answerVO);
+		return result;
+	}
+	
+	public String modifyAnswer() {return null;}
+	public String deleteAnswer() {return null;}
+	
+}

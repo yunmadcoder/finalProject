@@ -1,0 +1,400 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/project/css/source/jquery-ui.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/project/css/source/ui.fancytree.min.css">
+
+<div class="d-flex w-100">
+	<div class="w-100">
+		<div class="chat-container h-100 w-100">
+			<div class="chat-box-inner-part h-100">
+				<div class="chatting-box app-email-chatting-box">
+					<div class="p-9 py-3 chat-meta-user d-flex align-items-center justify-content-start">
+						<div class="card approval-item flex-fill">
+							<div class="card-header">
+								<div class="status">
+									<span class="badge approval-ongoing">진행중</span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="approval-title">
+									<a href="#">
+										<span class="font-weight-bold h5">기안문서제목1</span>
+									</a>
+								</div>
+								<div class="d-table">
+									<div class="d-table-row">
+										<div class="d-table-cell">기안자 :</div>
+										<div class="d-table-cell">테스트1호</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">기안일 :</div>
+										<div class="d-table-cell">2024-04-16</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">결재양식 :</div>
+										<div class="d-table-cell">업무기안</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer text-center approval-action m-0">
+								<a href="#" class="">
+									<span class="font-weight-bold">결재하기</span>
+								</a>
+							</div>
+						</div>
+						<div class="card approval-item flex-fill">
+							<div class="card-header">
+								<div class="status">
+									<span class="badge approval-finish">완료</span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="approval-title">
+									<a href="#">
+										<span class="font-weight-bold h5 approval-title">기안문서제목2</span>
+									</a>
+								</div>
+								<div class="d-table">
+									<div class="d-table-row">
+										<div class="d-table-cell">기안자 :</div>
+										<div class="d-table-cell">테스트2호</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">기안일 :</div>
+										<div class="d-table-cell">2024-04-16</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">결재양식 :</div>
+										<div class="d-table-cell">업무기안</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer text-center approval-action m-0">
+								<a href="#" class="">
+									<span class="font-weight-bold">결재하기</span>
+								</a>
+							</div>
+						</div>
+						<div class="card approval-item flex-fill">
+							<div class="card-header">
+								<div class="status">
+									<span class="badge bg-danger">반려</span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="approval-title">
+									<a href="#">
+										<span class="font-weight-bold h5 approval-title">기안문서제목3</span>
+									</a>
+								</div>
+								<div class="d-table">
+									<div class="d-table-row">
+										<div class="d-table-cell">기안자 :</div>
+										<div class="d-table-cell">테스트3호</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">기안일 :</div>
+										<div class="d-table-cell">2024-04-16</div>
+									</div>
+									<div class="d-table-row">
+										<div class="d-table-cell">결재양식 :</div>
+										<div class="d-table-cell">업무기안</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-footer text-center approval-action m-0">
+								<a href="#" class="">
+									<span class="font-weight-bold">결재하기</span>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<div class="ms-3 d-flex justify-content-start align-items-center">
+						<span class="font-weight-bold fs-6">기안 진행 문서</span>
+						<a href="#" role="button" tabindex="0" class="approval-popover" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-custom-class="custom-popover" data-bs-title="기안 문서 Tip" data-bs-content="현재 진행중인 기안문서 5개를, 최근 등록 순서대로 표시합니다.">
+							<i class="fa-light fa-circle-info fa-xl fa-fw ms-2"></i>
+						</a>
+					</div>
+					<div class="p-9 py-3">
+
+
+						<table class="table table-sm table-hover text-nowrap customize-table mb-0 align-middle text-center" style="overflow: hidden; text-overflow: ellipsis;">
+							<colgroup>
+								<col style="width: 10%">
+								<col style="width: 20%">
+								<col style="width: 10%">
+								<col style="width: 40%">
+								<col style="width: 10%">
+								<col style="width: 10%">
+							</colgroup>
+							<thead class="text-dark fs-4 border table-light">
+								<tr>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">기안일</h6>
+									</th>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">결재양식</h6>
+									</th>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">긴급</h6>
+									</th>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">제목</h6>
+									</th>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">첨부</h6>
+									</th>
+									<th>
+										<h6 class="fs-4 fw-semibold mb-0">결재상태</h6>
+									</th>
+								</tr>
+							</thead>
+							<tbody class="">
+								<tr>
+									<td>2024-04-15</td>
+									<td>
+										<p class="mb-0 fw-normal fs-4">업무기안</p>
+									</td>
+									<td>
+										<span class="">
+											<i class="fa-solid fa-light-emergency-on fa-fade fa-xl" style="color: #ff0000;"></i>
+										</span>
+									</td>
+									<td>
+										<a href="#">
+											<span>휴가신청서</span>
+										</a>
+									</td>
+									<td>
+										<span></span>
+									</td>
+									<td>
+										<span class="badge approval-ongoing"> 진행중 </span>
+									</td>
+								</tr>
+								<tr>
+									<td>2024-03-25</td>
+									<td>
+										<p class="mb-0 fw-normal fs-4">휴가신청서</p>
+									</td>
+									<td>
+										<span class="">
+											<i class="fa-solid fa-light-emergency-on fa-fade fa-xl" style="color: #ff0000;"></i>
+										</span>
+									</td>
+									<td>
+										<a href="#">
+											<span>테스트신청서</span>
+										</a>
+									</td>
+									<td>
+										<span></span>
+									</td>
+									<td>
+										<span class="badge approval-ongoing"> 진행중 </span>
+									</td>
+								</tr>
+								<tr>
+									<td>2024-03-15</td>
+									<td>
+										<p class="mb-0 fw-normal fs-4">업무기안</p>
+									</td>
+									<td>
+										<span class="">
+											<i class="fa-solid fa-light-emergency-on fa-xl fa-fw" style="color: #999999;"></i>
+										</span>
+									</td>
+									<td>
+										<a href="#">
+											<span>테스트</span>
+										</a>
+									</td>
+									<td>
+										<span></span>
+									</td>
+									<td>
+										<span class="badge approval-ongoing"> 진행중 </span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="table-responsive">
+						<div class="ms-3 d-flex justify-content-start align-items-center">
+							<span class="font-weight-bold fs-6">완료 문서</span>
+							<a href="#" role="button" tabindex="0" class="approval-popover" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-placement="top" data-bs-custom-class="custom-popover" data-bs-title="완료 문서 Tip" data-bs-content="최근에 결재 완료된 순서대로, 최대 5개의 목록을 표시합니다.">
+								<i class="fa-light fa-circle-info fa-xl fa-fw ms-2"></i>
+							</a>
+						</div>
+						<div class="p-9 py-3">
+
+							<table class="table table-sm table-hover text-nowrap customize-table mb-0 align-middle table-responsive text-center" style="overflow: hidden; text-overflow: ellipsis;">
+								<colgroup>
+									<col style="width: 10%">
+									<col style="width: 20%">
+									<col style="width: 10%">
+									<col style="width: 25%">
+									<col style="width: 10%">
+									<col style="width: 15%">
+									<col style="width: 10%">
+								</colgroup>
+								<thead class="text-dark fs-4 border table-light">
+									<tr>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">기안일</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">결재양식</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">긴급</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">제목</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">첨부</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">문서번호</h6>
+										</th>
+										<th>
+											<h6 class="fs-4 fw-semibold mb-0">결재상태</h6>
+										</th>
+									</tr>
+								</thead>
+								<tbody class="">
+									<tr>
+										<td>2024-04-15</td>
+										<td>
+											<p class="mb-0 fw-normal fs-4">휴가신청서</p>
+										</td>
+										<td>
+											<span class="">
+												<i class="fa-solid fa-light-emergency-on fa-xl" style="color: #999999;"></i>
+											</span>
+										</td>
+										<td>
+											<a href="#">
+												<span>휴가 갑니다</span>
+											</a>
+										</td>
+										<td>
+											<span></span>
+										</td>
+										<td>
+											<span>테스트문서-2024-00002</span>
+										</td>
+										<td>
+											<span class="badge approval-finish"> 완료 </span>
+										</td>
+									</tr>
+									<tr>
+										<td>2024-04-10</td>
+										<td>
+											<p class="mb-0 fw-normal fs-4">휴일근무신청서</p>
+										</td>
+										<td>
+											<span class="">
+												<i class="fa-solid fa-light-emergency-on fa-fade fa-xl" style="color: #ff0000;"></i>
+											</span>
+										</td>
+										<td>
+											<a href="#">
+												<span>일할게요..</span>
+											</a>
+										</td>
+										<td>
+											<span></span>
+										</td>
+										<td>
+											<span>테스트문서-2024-00001</span>
+										</td>
+										<td>
+											<span class="badge approval-finish"> 완료 </span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+
+<div id="approval-modal" class="interactive-modal" style="z-index: 1;">
+	<div class="interactive-modal-content modal-config">
+		<header class="position-relative p-4">
+			<h5 class="font-weight-bold">결재양식 선택</h5>
+			<a href="#" class="position-absolute" id="modal-exit">
+				<i class="fa-regular fa-xmark fa-fw fa-xl fa"></i>
+			</a>
+		</header>
+		<div class="d-flex justify-content-end align-items-center">
+			<button class="btn btn-outline-muted rounded-0 p-1">자주 쓰는 양식으로 추가</button>
+		</div>
+		<div class="row mt-2">
+			<div class="col-md-5" id="">
+				<div class="searchInput input-group">
+					<input type="text" id="search-input" class="form-control rounded-0" maxlength="20" placeholder="양식제목" />
+					<button type="button" class="btn btn-dark bg-dark rounded-0">
+						<i class="fa-light fa-magnifying-glass fa-xl fa-fw"></i>
+					</button>
+				</div>
+				<div id="tree" style="height: 300px;"></div>
+			</div>
+			<div class="col-7 doc-detail" id="">
+				<div class="card rounded-0">
+					<div class="p-2 approval-gray border-bottom">
+						<span class="text-start font-weight-bold text-dark m-2">상세정보</span>
+					</div>
+					<div class="card-body rounded-0 p-0">
+						<table class="table table-borderless text-center align-middle">
+							<tr class="border-bottom">
+								<th>제목</th>
+								<td>업무기안</td>
+							</tr>
+							<tr class="border-bottom">
+								<th>전사문서함</th>
+								<td>문서함</td>
+							</tr>
+							<tr class="border-bottom">
+								<th>기안부서</th>
+								<td>
+									<select name="" id="" class="form-select rounded-0">
+										<option value="">다우그룹</option>
+									</select>
+								</td>
+							</tr>
+							<tr class="border-bottom">
+								<th>부서문서함</th>
+								<td>
+									<select name="" id="" class="form-select rounded-0">
+										<option value="">미지정</option>
+									</select>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer text-end doc-footer mt-3">
+			<a href="#" class="btn btn-secondary rounded-0" id="actionBtn">
+				<span>확인</span>
+			</a>
+			<a href="#" class="btn btn-muted rounded-0 ms-2" id="cancelBtn">
+				<span>취소</span>
+			</a>
+		</div>
+	</div>
+</div>
+<script src="${pageContext.request.contextPath }/resources/project/js/source/jquery-ui.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/project/js/source/jquery.fancytree-all-deps.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/project/js/approval/approval-main.js"></script>
+<script src="${pageContext.request.contextPath }/resources/project/js/approval/approval-modal.js"></script>

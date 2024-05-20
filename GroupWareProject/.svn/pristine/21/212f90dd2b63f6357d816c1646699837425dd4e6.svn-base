@@ -1,0 +1,86 @@
+package kr.or.ddit.groupware.controller.myReservation;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.groupware.service.employee.IEmployeeService;
+import kr.or.ddit.groupware.service.reservation.IReservationService;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.MtgRoomReservVO;
+import kr.or.ddit.groupware.vo.PaginationInfoVO;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ *나의에약 컨트롤러
+ * @author <strong>민경선</strong>
+ * @version 1.0
+ * @see MyReservationController
+ */
+@Slf4j
+@Controller
+@RequestMapping("/")
+public class MyReservationController {
+	
+	@Inject
+	private IReservationService reservationService;
+	@Inject
+	private IEmployeeService employeeService;
+	
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@RequestMapping("/reservationList")
+	public String list(
+			@RequestParam(name = "page", required = false, defaultValue = "1")int currentPage,
+			@RequestParam(required = false)String searchWord, 
+			Model model) {
+		
+		//사원번호가져오기
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		EmployeeVO employeeVO = customUser.getEmployeeVO();
+		int emplNo = employeeVO.getEmplNo(); 
+		
+		PaginationInfoVO<MtgRoomReservVO> pagingVO = new PaginationInfoVO<MtgRoomReservVO>();
+		pagingVO.setEmplNo(emplNo);
+		
+//		검색결과가 존재하면
+		if(StringUtils.isNotBlank(searchWord)) {
+			pagingVO.setSearchWord(searchWord);
+			model.addAttribute("searchWord",searchWord);
+		}
+		
+		
+//		페이지 설정
+		pagingVO.setCurrentPage(currentPage);
+//		총 예약내역
+		int totalRecord = reservationService.selectReservCount(pagingVO);
+		pagingVO.setTotalRecord(totalRecord);
+		
+		List<MtgRoomReservVO> dataList = reservationService.selectReservList(pagingVO);
+		pagingVO.setDataList(dataList);
+		
+		
+		model.addAttribute("pagingVO", pagingVO);
+	
+		return "myReservation/list";
+		
+	
+	
+	}
+					 
+
+	
+}
+	
+	
+

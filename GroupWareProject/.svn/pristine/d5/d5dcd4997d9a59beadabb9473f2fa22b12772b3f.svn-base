@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.mapper.drive;
+
+/**
+ * 자료실 SQL Mapper
+ * @author 이명문
+ * @version 1.0
+ * @see IDriveMapper
+ */
+public interface IDriveMapper {
+
+}

@@ -1,0 +1,11 @@
+package kr.or.ddit.groupware.mapper.approval;
+
+/**
+ * 전자결재 SQL Mapper
+ * @author 이명문
+ * @version 1.0
+ * @see IApprovalMapper
+ */
+public interface IApprovalMapper {
+
+}

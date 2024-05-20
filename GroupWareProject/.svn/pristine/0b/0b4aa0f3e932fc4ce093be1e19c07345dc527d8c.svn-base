@@ -1,0 +1,57 @@
+package kr.or.ddit.groupware.controller.approval;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.groupware.service.approval.IApprovalService;
+import kr.or.ddit.groupware.vo.ApprovalVO;
+
+/**
+ * 전자결재 컨트롤러
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see ApprovalController
+ */
+@Controller
+@RequestMapping("/approval")
+public class ApprovalController {
+	
+	@Inject
+	private IApprovalService approvalService;
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("")
+	public String approvalMain() {
+		return "approval/approvalmain";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/form")
+	public String approvalForm(Model model) {
+		return "approval/approvalform";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@GetMapping("/list/{type}")
+	public String approvalList(@PathVariable String type, Model model) {
+		List<ApprovalVO> approvalList = approvalService.selectApprovalList(type);
+		model.addAttribute("approvalList", approvalList);
+		model.addAttribute("type", type);
+		return "approval/approvallist";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@PostMapping("/insert")
+	public String approvalInsert() {
+		return "/approval";
+	}
+}

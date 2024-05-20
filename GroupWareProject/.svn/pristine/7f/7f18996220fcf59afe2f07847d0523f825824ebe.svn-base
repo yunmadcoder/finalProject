@@ -1,0 +1,79 @@
+package kr.or.ddit.groupware.controller.rental;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.groupware.service.rental.IRentalService;
+import kr.or.ddit.groupware.service.reservation.IReservationService;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.MtgRoomReservVO;
+import kr.or.ddit.groupware.vo.RentalVO;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @method : carRent
+ * @auther : <strong>민경선</strong>
+ * @param : vo
+ * @return : ""
+ * @date : 2024. 4. 20
+ */
+@Controller
+@RequestMapping("/")
+@Slf4j
+public class RentalController {
+
+		@Autowired
+		private IRentalService rentalService;
+		@PreAuthorize("hasRole('ROLE_MEMBER')")
+		@PostMapping("/addVehicleReservation")
+		public ResponseEntity<String> rentVehicle(@RequestBody RentalVO rentalVO) {
+			CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			EmployeeVO employeeVO = customUser.getEmployeeVO();
+
+			rentalVO.setEmplNo(employeeVO.getEmplNo());
+
+			Result result = rentalService.RentVehicle(rentalVO);
+
+			if (result.equals(Result.OK)) {
+				return new ResponseEntity<String>("success", HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<String>("failed", HttpStatus.OK);
+			}
+
+		}
+		
+		@PreAuthorize("hasRole('ROLE_MEMBER')")
+		@PostMapping("/addSuppliesReservation")
+		public ResponseEntity<String> rentSupplies(@RequestBody RentalVO rentalVO) {
+			CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			EmployeeVO employeeVO = customUser.getEmployeeVO();
+
+			rentalVO.setEmplNo(employeeVO.getEmplNo());
+
+			Result result = rentalService.RentSupplies(rentalVO);
+
+			if (result.equals(Result.OK)) {
+				return new ResponseEntity<String>("success", HttpStatus.OK);
+			}
+			else {
+				return new ResponseEntity<String>("failed", HttpStatus.OK);
+			}
+
+		}
+		
+	}
+

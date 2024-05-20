@@ -1,0 +1,154 @@
+package kr.or.ddit.groupware.controller.notification;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.notification.INotificationService;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.CustomUser;
+import kr.or.ddit.groupware.vo.EmployeeVO;
+import kr.or.ddit.groupware.vo.NotificationVO;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 알림 컨트롤러
+ * 
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @see NotificationController
+ */
+@RestController
+@RequiredArgsConstructor
+@EnableScheduling
+public class NotificationController {
+
+	@Inject
+	private INotificationService notiService;
+
+	ObjectMapper mapper = new ObjectMapper();
+
+	private Map<Integer, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
+	private Map<Integer, NotificationVO> notiMap = new ConcurrentHashMap<>();
+	
+	private EmployeeVO employeeVO = null; 
+
+	/**
+	 * @method : selectNotiList
+	 * @auther : <strong>이명문</strong>
+	 * @return : JSON 형식으로 변환한 notiList
+	 * @date : 2024. 4. 15
+	 */
+	@GetMapping(value = "/notilist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> selectNotiList() throws Exception {
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int emplNo = customUser.getEmployeeVO().getEmplNo();
+		NotificationVO notiVO = new NotificationVO();
+		notiVO.setNtcnRecp(emplNo);
+		
+		List<NotificationVO> notiList = notiService.selectNotReadNotiFive(notiVO);
+
+		return ResponseEntity.status(HttpStatus.OK).body(mapper.writeValueAsString(notiList));
+	}
+
+	/**
+	 * @method : notiRead
+	 * @auther : <strong>이명문</strong>
+	 * @param  : notificationVO - ntcnNo(키값)이 담긴 VO
+	 * @return : result - 결과 값 (OK/FAILED)
+	 * @date : 2024. 4. 15
+	 */
+	@PostMapping(value = "/notiread", produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> notiRead(@RequestBody NotificationVO notificationVO) {
+		Result result = notiService.notiRead(notificationVO);
+		return ResponseEntity.ok(result.toString());
+	}
+
+	/**
+	 * @method : notiDelete
+	 * @auther : <strong>이명문</strong>
+	 * @param  : notificationVO - ntcnNo(키값)이 담긴 VO
+	 * @return : result - 결과 값 (OK/FAILED)
+	 * @date : 2024. 4. 15
+	 */		
+	@PreAuthorize("hasRole('ROLE_MEMBER')")
+	@PostMapping(value = "/notidelete", produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> notiDelete(@RequestBody NotificationVO notificationVO) {
+		Result result = notiService.notiDelete(notificationVO);
+		return ResponseEntity.ok(result.toString());
+	}
+
+	/**
+	 * @method : handleEvents
+	 * @auther : <strong>이명문</strong>
+	 * @return : emitter - SseEmitter 객체 반환
+	 * @date : 2024. 4. 15
+	 */
+	@GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public SseEmitter handleEvents() {
+		SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+		CustomUser customUser = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int emplNo = customUser.getEmployeeVO().getEmplNo();
+		NotificationVO notiVO = new NotificationVO();
+		notiVO.setNtcnRecp(emplNo);
+		
+		employeeVO = customUser.getEmployeeVO();
+		sseEmitters.put(emplNo, emitter);
+		notiMap.put(emplNo, notiVO);
+		return emitter;
+	}
+
+	/**
+	 * @method : run
+	 * @auther : <strong>이명문</strong>
+	 * @date : 2024. 4. 15
+	 */
+	@Scheduled(cron = "0 * * * * *")
+	public void run() {
+		
+		if(employeeVO == null) {
+			return;
+		}
+		
+		SseEmitter emitter = sseEmitters.get(employeeVO.getEmplNo());
+		NotificationVO notiVO = notiMap.get(employeeVO.getEmplNo());
+		
+		List<NotificationVO> notiList = notiService.selectNotiList(notiVO);
+		try {
+			if (notiList.size() > 0) {
+				for (NotificationVO notificationVO : notiList) {
+					LocalDateTime reservationTime = notificationVO.getLocalDt();
+					LocalDateTime currentTime = LocalDateTime.now();
+
+					if (reservationTime.getYear() == currentTime.getYear()
+							&& reservationTime.getMonth().equals(currentTime.getMonth())
+							&& reservationTime.getDayOfMonth() == currentTime.getDayOfMonth()
+							&& reservationTime.getHour() == currentTime.getHour()
+							&& reservationTime.getMinute() == currentTime.getMinute()) {
+						emitter.send(SseEmitter.event().data(mapper.writeValueAsString(notificationVO)));
+					}
+				}
+			}
+		} catch (Exception e) {
+			emitter.completeWithError(e);
+		}
+	}
+}

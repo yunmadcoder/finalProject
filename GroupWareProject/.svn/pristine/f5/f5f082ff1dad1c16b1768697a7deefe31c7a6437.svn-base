@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.schedule.IScheduleMapper">
+	
+	<select id="selectScheduleListByEmplNo" parameterType="int" resultType="scheduleVO">
+		select
+		    a.schdul_no, a.schdul_group_no, a.schdul_nm, a.schdul_bgnde, a.schdul_endde, a.schdul_cn, a.schdul_font_color, a.schdul_bgrn_color, a.schdul_place, a.allday_yn
+		from
+		    schedule a, schdul_participant b, sch_group c
+		where
+		    b.empl_no = #{emplNo} and
+		    a.schdul_no = b.schdul_no and
+		    a.schdul_group_no = c.schdul_group_no and
+		    c.schdul_type_code = 'C103'
+	</select>
+	
+	<select id="selectScheduleListByDeptCode" parameterType="String" resultType="scheduleVO">
+		select
+    		a.schdul_no, a.schdul_group_no, a.schdul_nm, a.schdul_bgnde, a.schdul_endde, a.schdul_cn, a.schdul_font_color, a.schdul_bgrn_color, a.schdul_place, a.allday_yn
+		from
+		    schedule a, sch_group b
+		where
+		    a.schdul_group_no = b.schdul_group_no and
+		    b.psitn_code = #{deptCode}
+	</select>
+	
+	<select id="selectCompanyScheduleList" resultType="scheduleVO">
+		select
+		    a.schdul_no, a.schdul_group_no, a.schdul_nm, a.schdul_bgnde, a.schdul_endde, a.schdul_cn, a.schdul_font_color, a.schdul_bgrn_color, a.schdul_place, a.allday_yn
+		from
+		    schedule a, sch_group b
+		where
+		    a.schdul_group_no = b.schdul_group_no and
+		    b.schdul_type_code = 'C101'
+	</select>
+	
+	<select id="selectScheduleBySchdulNo" parameterType="String" resultType="scheduleVO">
+		select
+		    schdul_no, schdul_group_no, schdul_nm, schdul_bgnde, schdul_endde, schdul_cn, schdul_font_color, schdul_bgrn_color, schdul_place, allday_yn
+		from
+		    schedule
+		where
+			schdul_no = #{schdulNo}
+	</select>
+	
+	<select id="selectScheduleListByEmplNoNDate" parameterType="Map" resultType="scheduleVO">
+		SELECT
+		    a.schdul_no,
+		    schdul_group_no,
+		    schdul_nm,
+		    schdul_bgnde,
+		    schdul_endde,
+		    schdul_cn,
+		    schdul_font_color,
+		    schdul_bgrn_color,
+		    schdul_place,
+		    register,
+		    allday_yn
+		FROM
+		    schedule a, schdul_participant b
+		where 
+		    a.schdul_no = b.schdul_no
+		    and b.empl_no = #{emplNo}
+		    <![CDATA[ 
+			    and a.schdul_bgnde <= #{dateToCheck}
+			    and a.schdul_endde >= #{dateToCheck}
+		     ]]>
+	
+	</select>
+	
+</mapper>

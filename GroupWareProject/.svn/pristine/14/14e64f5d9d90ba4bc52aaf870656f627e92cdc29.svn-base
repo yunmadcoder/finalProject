@@ -1,0 +1,18 @@
+package kr.or.ddit.groupware.service.approval;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.ApprovalVO;
+
+/**
+ * 전자 결재 서비스 인터페이스
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @date : 2024. 4. 15
+ * @see IApprovalService
+ */
+public interface IApprovalService {
+
+	List<ApprovalVO> selectApprovalList(String type);
+
+}

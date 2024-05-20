@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.groupware.mapper.rental.IRentalMapper">
+
+	<sql id="commonInsert">
+		INSERT INTO EQUIPMENT_RENTAL (
+	           	ERNT_NO,
+				EMPL_NO,
+				EQPNM_CD,
+				ERNT_QY,
+				ERNT_RESN,
+				PRMISN_YN,
+				ERNT_BEGIN_DT,
+				ERNT_END_DT,
+	<!-- 			ERNT_RTURN_DT -->
+				RGSDE,
+				RESOURCE_TYPE
+	        ) VALUES (
+	            #{erntNo},  
+	            #{emplNo},
+	            #{eqpnmCd},
+	           	1,
+	            #{erntResn},
+	            'N',
+	            #{erntBeginDt, jdbcType=VARCHAR},
+	            #{erntEndDt, jdbcType=VARCHAR},
+	<!--             #{erntRturnDt, jdbcType=VARCHAR}, -->
+	            SYSDATE,
+	            #{resourceType}
+	        )
+	</sql>
+
+
+	<insert id="rentVehicle" parameterType="rentalVO">
+		<selectKey keyProperty="erntNo" resultType="int" order="BEFORE">
+			select seq_EQUIPMENT_RENTAL.nextval from dual
+		</selectKey>
+		<include refid="commonInsert" />
+	</insert>
+	
+	<insert id="rentSupplies" parameterType="rentalVO">
+		<selectKey keyProperty="erntNo" resultType="int" order="BEFORE">
+			select seq_EQUIPMENT_RENTAL.nextval from dual
+		</selectKey>
+		<include refid="commonInsert" />
+	</insert>
+
+	<select id="findRentalByResourceType" parameterType="map" resultType="rentalVO">
+		 SELECT
+	            ERNT_NO,
+				EMPL_NO,
+				EQPNM_CD,
+	            TO_CHAR(ERNT_BEGIN_DT, 'YYYY-MM-DD HH24:MI:SS') AS ERNT_BEGIN_DT,
+	            TO_CHAR(ERNT_END_DT, 'YYYY-MM-DD HH24:MI:SS') AS ERNT_END_DT,
+	            ERNT_RESN,
+	            ERNT_QY,
+	            RESOURCE_TYPE
+	        FROM
+	            EQUIPMENT_RENTAL
+	        WHERE
+	        RESOURCE_TYPE IN ( 'vehicle', 'supplies')
+	</select>
+
+	 	<select id="findOverlappingRentals" resultType="rentalVO">
+	    <![CDATA[
+	     SELECT ERNT_NO, EMPL_NO, EQPNM_CD, RGSDE, ERNT_BEGIN_DT, ERNT_END_DT, RESOURCE_TYPE 
+	     FROM EQUIPMENT_RENTAL
+	     WHERE ERNT_NO = #{erntNo} 
+	      AND (
+	         ERNT_BEGIN_DT <= #{erntBeginDt,jdbcType=VARCHAR} AND 
+	         ERNT_END_DT >= #{erntEndDt,jdbcType=VARCHAR}
+	       ) 
+	     ]]>
+		</select>	
+
+
+
+
+</mapper>

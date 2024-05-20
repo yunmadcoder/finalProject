@@ -1,0 +1,40 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<div class="card position-relative overflow-hidden rounded-0">
+	<div class="shop-part d-flex w-100">
+		<div class="flex-shrink-0" style="border-right: 1px solid #ddd; width: 13%" id="sideArea">
+			<div class="px-9 pt-4 pb-3">
+				<a href="/admin/documents/stat">
+					<h3 class="mb-4" style="font-weight: 600; margin-left: 10px;">
+						<i class="fa-sharp fa-regular fa-file-signature fa-fw fa"></i>
+						양식 통계
+					</h3>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="company">
+					<span class="fs-6 ms-5">전체 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="department">
+					<span class="fs-6 ms-5">부서별 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="private">
+					<span class="fs-6 ms-5">얍얍얍</span>
+				</a>
+			</div>
+		</div>
+		<div class="card-body p-4 pb-0" style="min-height: 85vh;">
+			<div class="d-flex align-items-center gap-6 mb-2">
+				<h5 class="fs-5 mb-0 fw-semibold d-none d-lg-block flex-grow-1" data-title="">양식 전체 통계</h5>
+				<button class="btn rounded-0" style="border: 1px solid #ddd;" id="all-log-btn">삐비빅</button>
+				<button class="btn btn-outline-light-indigo text-dark fw-semibold rounded-0 py-8 px-5" id="drive-upload">빰빠빰</button>
+			</div>
+			<div class="w-100 p-2 pb-3 bt-line">
+			</div>
+		</div>
+	</div>
+</div>

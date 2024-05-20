@@ -1,0 +1,431 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<style>
+.legend-item {
+    display: inline-block;
+    margin-right: 20px;
+}
+.color-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+.reserved {
+    background-color: #808080; /* 회색 */
+}
+.my-reservation {
+    background-color: #00BFFF; /* 하늘색 */
+}
+/* 모든 input 필드에 적용되는 스타일 */
+#reservationForm input {
+    border: none; /* 테두리 제거 */
+    background: transparent; /* 배경색 투명 */
+}
+
+/* 일정 이름 필드 스타일 재정의 */
+#reservationForm input#title {
+    border: 1px solid #ccc; /* 테두리를 회색으로 설정 */
+    background: white; /* 배경색을 흰색으로 설정 */
+}
+
+</style>
+<div class="card">
+			<div class="row gx-0">
+				<div class="calendar-header">
+	    			<div id="legend">
+				        <span class="legend-item"><span class="color-box reserved"></span>예약됨</span>
+				        <span class="legend-item"><span class="color-box my-reservation"></span>나의 예약</span>
+	    			</div>
+				</div>
+			
+			<div class="col-lg-2">
+				<div class="p-4 calendar-sidebar">
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<a href="#" class="nav-link" id="all-resources">전체설비</a>
+							<ul class="submenu">
+								<li><a href="#" class="nav-link" id="meeting-rooms">회의실</a></li>
+								<li><a href="#" class="nav-link" id="vehicles">차량</a></li>
+								<li><a href="#" class="nav-link" id="supplies">비품</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-10">
+				<div class="p-4 calender-sidebar app-calendar">
+					<div id="calendar"></div>
+				</div>
+			</div>
+		</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">일정 추가하기</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+					<!--회의실예약폼시작  -->
+				<form id="meetingRoomForm" class="reservation-form" style="display: none;">
+					<div class="modal-body">
+						<input id="resourceType" name="resourceType" hidden value="room">
+						   			
+						예약할자원:
+						  <input type="text" id="resourceNameRoom" readonly="readonly" >
+                    	  <input type="hidden" id="mtngRoomNoId" name="mtngRoomNo">
+						<br>
+						일정이름 :
+						<input type="text" id="resveCnId" name="resveCn" placeholder="일정 이름 입력"/>
+						<br /> 시작시간 :
+						<input  id="startRoom" name="resveBeginDt" readonly="readonly"/>
+						<br /> 종료시간 :
+						<input  id="endRoom" name="resveEndDt" readonly="readonly"/>
+						<br>
+						예약자:
+						<input type="text" id="loggedInUserName" value="${user.emplNm}" readonly="readonly" />
+						<input type="hidden" id="loggedInUserNo" name="emplNo" value="${user.emplNo}" />
+					</div>
+					<!--차량예약폼시작  -->
+				</form>
+				<form id="vehicleForm" class="reservation-form" style="display: none;">
+					<div class="modal-body">
+						<input id="resourceType" name="resourceType" hidden  value="vehicle">
+						예약할자원:
+						  <input type="text" id="resourceNameVehicle" readonly="readonly" >
+                    	  <input type="hidden" id="eqpnmCdIdCar" name="eqpnmCd">
+						<br>
+						대여사유:
+						<input type="text" id="erntResnIdCar" name="erntResn" placeholder="대여사유입력"/>
+						<br /> 시작시간 :
+						<input  id="startVehicle" name="erntBeginDt" readonly="readonly"/>
+						<br /> 종료시간 :
+						<input  id="endVehicle" name="erntEndDt" readonly="readonly"/>
+						<br>
+						예약자:
+						<input type="text" id="loggedInUserName" value="${user.emplNm}" readonly="readonly" />
+						<input type="hidden" id="loggedInUserNo" name="emplNo" value="${user.emplNo}" />
+					</div>
+				</form>
+				
+					<!--비품예약폼시작  -->
+				<form id="suppliesForm" class="reservation-form" style="display: none;">
+					<div class="modal-body">
+						<input id="resourceType" name="resourceType" hidden  value="supplies">
+						예약할자원:
+						  <input type="text" id="resourceNameSupplies" readonly="readonly" >
+                    	  <input type="hidden" id="eqpnmCdIdSupplies" name="eqpnmCd">
+						<br>
+						대여사유:
+						<input type="text" id="erntResnIdSupplies" name="erntResn" placeholder="대여사유입력"/>
+						<br /> 시작시간 :
+						<input  id="startSupplies" name="erntBeginDt" readonly="readonly"/>
+						<br /> 종료시간 :
+						<input  id="endSupplies" name="erntEndDt" readonly="readonly"/>
+						<br>
+						예약자:
+						<input type="text" id="loggedInUserName" value="${user.emplNm}" readonly="readonly" />
+						<input type="hidden" id="loggedInUserNo" name="emplNo" value="${user.emplNo}" />
+					</div>
+				</form>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				<button type="button" class="btn btn-primary" id="saveChanges">신청</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal END -->
+<%-- <script src="${pageContext.request.contextPath }/resources/project/js/sweetalert_custom.js"></script> --%>
+<%-- <script src="${pageContext.request.contextPath }/resources/project/js/source/index.global.min.js"></script> --%>
+ <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js'></script>
+ 
+<script>
+
+var calendar; // 전역 범위에서 calendar 변수 선언
+var resourcesForRooms = [
+    { id: '1', title: '제 1회의실' },
+    { id: '2', title: '제 2회의실' },
+    { id: '3', title: '제 3회의실' },
+    { id: '4', title: '제 4회의실' },
+    { id: '5', title: '제 5회의실' }
+];
+var resourcesForVehicles = [
+    { id: '6', title: '차량1' },
+    { id: '7', title: '차량2' },
+    { id: '8', title: '차량3' },
+    { id: '9', title: '차량4' },
+    { id: '10', title: '차량5' }
+];
+var resourcesForSupplies = [
+    { id: '11', title: '비품1' },
+    { id: '12', title: '비품2' },
+    { id: '13', title: '비품3' },
+    { id: '14', title: '비품4' },
+    { id: '15', title: '비품5' }
+];
+
+/* 예약데이터 가져오기 */
+function fetchResourceReservations(resourceType) {
+	console.log(resourceType);
+	$.ajax({
+		 url: '/reservations/' + encodeURIComponent(resourceType),  // 서버 API 경로
+        type: 'GET',
+        dataType: 'json',
+        beforeSend : function(xhr) {
+			xhr.setRequestHeader(header, token);
+		},
+        
+        success: function(data) {
+        	console.log(data);
+            setupCalendar(data, resourceType); // 데이터를 받아 캘린더 설정
+        },
+        error: function(error) {
+            console.error('Error fetching reservations:', error);
+        }
+    });
+}
+/* 예약데이터 조회*/
+function setupCalendar(reservations, resourceType) {
+
+    var calendarEl = document.getElementById('calendar');
+    var events = []; // 이벤트 배열 초기화
+    var loggedInUserNo = document.getElementById('loggedInUserNo').value;
+
+    reservations.forEach(function(reservation) {
+        if (reservation && reservation.mtngRoomNo != null) {
+        	var isMyReservation = reservation.emplNo === loggedInUserNo; // Check if the logged-in user made the reservation
+            var backgroundColor = isMyReservation ? '#00BFFF' : '#808080'; // Sky blue if user's reservation, grey otherwise
+            events.push({
+                title: reservation.resveCn || 'No title', // Provide default if no title
+                start: reservation.resveBeginDt,
+                end: reservation.resveEndDt,
+                resourceId: reservation.mtngRoomNo.toString(),
+                backgroundColor: backgroundColor, // Set color based on ownership
+                borderColor: isMyReservation ? '#007BFF' : '#505050', // Optional: Different border color
+                editable: isMyReservation // Allow editing only for user's own reservations
+            });
+        } else {
+            console.error('Invalid reservation data', reservation);
+        }
+    });
+
+    // 이전 캘린더 인스턴스 제거
+    if (calendar) {
+        calendar.destroy();
+    }
+
+    // 새 캘린더 인스턴스 생성
+    calendar = new FullCalendar.Calendar(calendarEl, {
+
+        initialView: 'resourceTimelineDay',
+        height: '700px',
+        expandRows: true,
+        slotMinTime: '09:00',
+        slotMaxTime: '23:00',
+        slotDuration: '00:30:00',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'resourceTimelineDay',
+        },
+       
+        locale: 'ko',
+        selectable: true,
+//         selectMirror: true,
+//         navLinks: true,
+        editable: true,
+        dayMaxEventRows: true,
+        nowIndicator: true,
+        resources: getResourceForType(resourceType), // 리소스 타입에 맞는 리소스 배열
+        events: events, // 생성된 이벤트 배열 사용
+        /*상세보기이벤트  */
+        eventClick: function(info) {
+            //마이예약일 경우에만 클릭가능
+            if (info.event.extendedProps.editable) {
+                fillDetailsModal(info.event);
+                $('#exampleModal').modal('show');
+            } else {
+                alert("You cannot edit this reservation.");
+            }
+        },
+        select: function(arg) {
+
+        /* 회의실 시간구간 선택 */	
+        $('#startRoom').val(formatDateToCustomFormat(arg.startStr));
+        $('#endRoom').val(formatDateToCustomFormat(arg.endStr));
+        /* 차량 시간구간 선택 */	
+        $('#startVehicle').val(formatDateToCustomFormat(arg.startStr));
+        $('#endVehicle').val(formatDateToCustomFormat(arg.endStr));
+        /* 비품 시간구간 선택 */	
+        $('#startSupplies').val(formatDateToCustomFormat(arg.startStr));
+        $('#endSupplies').val(formatDateToCustomFormat(arg.endStr));
+        
+        /*예약자원명 자동입력  */
+        $('#resourceNameRoom').val(arg.resource.title);
+        $('#resourceNameVehicle').val(arg.resource.title);
+        $('#resourceNameSupplies').val(arg.resource.title);
+        $('#mtngRoomNoId').val(arg.resource.id);
+        $('#eqpnmCdIdCar').val(arg.resource.id);
+        $('#eqpnmCdIdSupplies').val(arg.resource.id);
+        $('#exampleModal').modal('show');
+        calendar.unselect();
+        },
+        selectAllow: function(arg) {
+            return new Date(arg.start) >= new Date(); // Disallow selection of past dates
+        },
+    });
+
+    calendar.render();
+}
+
+function getResourceForType(resourceType) {
+    switch (resourceType) {
+        case 'room':
+            return resourcesForRooms;
+        case 'vehicle':
+            return resourcesForVehicles;
+        case 'supply':
+            return resourcesForSupplies;
+        default:
+            return []; // 기본값은 빈 배열
+    }
+}
+function fillDetailsModal(event) {
+    // Fill modal fields only if the event is editable
+    if (event.extendedProps.editable) {
+        document.getElementById('title').value = event.title;
+        document.getElementById('start').value = formatDateToCustomFormat(event.start);
+        document.getElementById('end').value = formatDateToCustomFormat(event.end);
+        // additional fields as needed
+    }
+}
+
+
+    // 이벤트 핸들러 등록
+    document.getElementById('meeting-rooms').addEventListener('click', function() {
+    	document.getElementById('resourceType').value = 'room'; // 회의실 옵션 선택
+    	setupCalendar(resourcesForRooms);
+        fetchResourceReservations('room');
+        showForm('meetingRoomForm');
+        
+    });
+    document.getElementById('vehicles').addEventListener('click', function() {
+    	document.getElementById('resourceType').value = 'vehicle'; // 회의실 옵션 선택
+    	setupCalendar(resourcesForVehicles);
+        fetchResourceReservations('vehicle');
+        showForm('vehicleForm');
+    });
+    document.getElementById('supplies').addEventListener('click', function() {
+    	document.getElementById('resourceType').value = 'supplies'; // 비품 옵션 선택
+    	setupCalendar(resourcesForSupplies);
+        fetchResourceReservations('supply');
+        showForm('suppliesForm');
+    });
+    function showForm(formId) {
+        // 모든 폼을 숨김
+        document.querySelectorAll('.reservation-form').forEach(form => {
+            form.style.display = 'none';
+        });
+        // 선택된 폼만 표시
+        document.getElementById(formId).style.display = 'block';
+    }
+
+//날짜 포맷 함수: Date 객체를 'YYYY-MM-DD HH24:MI' 형식의 문자열로 변환
+function formatDateToCustomFormat(date) {
+    var d = new Date(date);
+    var year = d.getFullYear();
+    var month = ('0' + (d.getMonth() + 1)).slice(-2);
+    var day = ('0' + d.getDate()).slice(-2);
+    var hour = ('0' + d.getHours()).slice(-2);
+    var minute = ('0' + d.getMinutes()).slice(-2);
+    return `\${year}-\${month}-\${day} \${hour}:\${minute}`;
+}
+
+
+function collectFormData() {
+    var formData = {};
+    var resourceType = document.getElementById('resourceType').value;
+
+    switch(resourceType) {
+        case 'room':
+            formData = {
+                resourceType: 'room',
+                mtngRoomNo: document.getElementById('mtngRoomNoId').value,
+                resveCn: document.getElementById('resveCnId').value,
+                resveBeginDt: formatDateToCustomFormat(document.getElementById('startRoom').value),
+                resveEndDt: formatDateToCustomFormat(document.getElementById('endRoom').value),
+                emplNo: document.getElementById('loggedInUserNo').value
+            };
+            break;
+        case 'vehicle':
+            formData = {
+                resourceType: 'vehicle',
+                eqpnmCd: document.getElementById('eqpnmCdIdCar').value,
+                erntResn: document.getElementById('erntResnIdCar').value,
+                erntBeginDt: formatDateToCustomFormat(document.getElementById('startVehicle').value),
+                erntEndDt: formatDateToCustomFormat(document.getElementById('endVehicle').value),
+                emplNo: document.getElementById('loggedInUserNo').value
+            };
+            break;
+        case 'supplies':
+            formData = {
+                resourceType: 'supplies',
+                eqpnmCd: document.getElementById('eqpnmCdIdSupplies').value,
+                resveCn: document.getElementById('erntResnIdSupplies').value,
+                resveBeginDt: formatDateToCustomFormat(document.getElementById('startSupplies').value),
+                resveEndDt: formatDateToCustomFormat(document.getElementById('endSupplies').value),
+                emplNo: document.getElementById('loggedInUserNo').value
+            };
+            break;
+    }
+
+    return formData;
+}
+
+
+document.getElementById('saveChanges').addEventListener('click', function() {
+	var formData =collectFormData();
+	
+	// URL을 formData의 내용에 따라 동적으로 결정
+    var url;
+    switch(formData.resourceType) {
+        case 'room':
+            url = '/addRoomReservation'; // 회의실 예약 처리 API
+            break;
+        case 'vehicle':
+            url = '/addVehicleReservation'; // 차량 예약 처리 API
+            break;
+        case 'supplies':
+            url = '/addSuppliesReservation'; // 비품 예약 처리 API
+            break;
+        default:
+            url = '/addReservation'; // 기본 예약 처리 API
+            break;
+    }
+	
+	    $.ajax({
+	        url: url,
+	        type: 'POST',
+	        processData: false,  
+	        contentType: "application/json;charset=utf-8",
+	        data: JSON.stringify(formData),
+	        beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+	        success: function(response) {
+	            $('#exampleModal').modal('hide');
+	            alert("예약이 성공적으로 등록되었습니다.");
+	            // 성공 후 페이지를 새로고침하거나 목록을 업데이트할 수 있습니다.
+	        },
+	        error: function(xhr, status, error) {
+	            alert("예약 등록에 실패했습니다. 오류: " + error);
+	        }
+	    });
+});
+
+
+</script>

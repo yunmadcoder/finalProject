@@ -1,0 +1,40 @@
+package kr.or.ddit.groupware.service.approval;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.ApprovalVO;
+import kr.or.ddit.groupware.vo.OrganizationTreeVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkGroupVO;
+import kr.or.ddit.groupware.vo.SanctionerBookmarkVO;
+import kr.or.ddit.groupware.vo.SanctionerVO;
+
+/**
+ * 전자 결재 서비스 인터페이스
+ * @author <strong>이명문</strong>
+ * @version 1.0
+ * @date : 2024. 4. 15
+ * @see IApprovalService
+ */
+public interface IApprovalService {
+
+	List<ApprovalVO> selectDraftList(ApprovalVO approvalVO);
+
+	List<OrganizationTreeVO> selectOragnTree();
+
+	int insertSanctionerGroup(SanctionerBookmarkGroupVO vo);
+
+	Result insertSanctioner(SanctionerBookmarkVO[] bookmarkList);
+	
+	List<SanctionerBookmarkGroupVO> selectMyLine(SanctionerBookmarkGroupVO vo);
+
+	Result deleteMyLine(SanctionerBookmarkGroupVO vo);
+
+	Result insertApproval(ApprovalVO approvalVO);
+
+	ApprovalVO selectApprovalDocument(int aprovlNo);
+
+	List<ApprovalVO> selectApprovalList(SanctionerVO sanctionerVO);
+
+
+}

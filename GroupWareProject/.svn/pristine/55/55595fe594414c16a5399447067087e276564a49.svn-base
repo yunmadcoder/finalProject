@@ -1,0 +1,205 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/project/css/source/apexcharts.min.css">
+
+<div class="card position-relative overflow-hidden rounded-0">
+	<div class="shop-part d-flex w-100">
+		<div class="flex-shrink-0" style="border-right: 1px solid #ddd; width: 13%" id="sideArea">
+			<div class="px-9 pt-4 pb-3">
+				<a href="/admin/approval/stat">
+					<h3 class="mb-4" style="font-weight: 600; margin-left: 10px;">
+						<i class="fa-sharp fa-regular fa-file-signature fa-fw fa"></i> 결재 통계
+					</h3>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="company">
+					<span class="fs-6 ms-5">전체 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="department">
+					<span class="fs-6 ms-5">부서별 통계</span>
+				</a>
+			</div>
+			<div class="py-3">
+				<a href="#" class="w-100 d-block a-menu" data-id="private">
+					<span class="fs-6 ms-5">얍얍얍</span>
+				</a>
+			</div>
+		</div>
+
+		<div class="container positon-relative mt-4">
+			<div class="card bg-white">
+				<div class="card-body p-5">
+					<div class="d-flex align-items-start gap-6 mb-2">
+						<h5 class="fs-5 mb-0 d-none fw-semibold d-lg-block flex-grow-1" data-title="">결재 전체 통계</h5>
+					</div>
+					<div class="w-100">
+						<div class="row" id="chartArea">
+							<div class="col-md-12">
+								<div id="charts"></div>
+							</div>
+							<div id="back"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="${pageContext.request.contextPath }/resources/project/js/source/apexcharts.min.js"></script>
+<script>
+	let colors = ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#546E7A'];
+	var chart = null;
+	let chartType = '1';
+	let isLoaded = false;
+	approvalChartRender();
+	
+	$('#chartArea').on('click', '#backBtn', function() {
+		approvalChartRender();
+		$(this).remove();
+	})
+	
+	function approvalDetailRender(deptNm) {
+        $.ajax({
+        	url: '/admin/approval/countstat',
+        	type: 'get',
+        	data: {chartType: chartType, deptNm : deptNm},
+        	async: false
+        })
+        .done(function(res) {
+        	returnData = createChartDate(res, chartType);
+        	
+        	chart.updateOptions({
+        		series: returnData.dataCount,
+				labels: returnData.dataLabel
+        	},true,true,true);
+        })
+        
+		chartType = '0';
+        
+        let jButton = $('<button class="btn" id="backBtn" style="border: 1px solid #ddd">');
+        jButton.text('뒤로가기');
+        $('#back').append(jButton);
+	}
+	
+	function approvalChartRender() {
+		let returnData;
+		$.ajax({
+			url : '/admin/approval/countstat',
+			type : 'get',
+			async : false,
+		})
+		.done(function(res) {
+			returnData = createChartDate(res);	
+			console.log(returnData);
+		});
+		
+		var options = {
+			    chart: {
+			        type: 'donut',
+			        events: {
+			        	dataPointSelection: function(e, chartContext, config) {
+			        		if(chartType == '1') {
+				                var deptNm = options.labels[config.dataPointIndex];
+				        		approvalDetailRender(deptNm);
+			        		}
+			        	}
+			        },
+			        foreColor: '#333', // 텍스트 색상 설정
+			        height:500,
+			        toolbar: {
+			            show: false // 상단 툴바 숨김
+			        },
+			        animations: {
+			            enabled: true,
+			            easing: 'easeinout',
+			            speed: 400,
+			            animateGradually: {
+			                enabled: true,
+			                delay: 150
+			            },
+			            dynamicAnimation: {
+			                enabled: true,
+			                speed: 350
+			            }
+			        }
+			    },
+			    series: returnData.dataCount,
+			    labels: returnData.dataLabel,
+			    colors: colors,
+			    plotOptions: {
+			        pie: {
+			            donut: {
+			                labels: {
+			                    show: true,
+			                    total: {
+			                        show: true,
+			                        label: '전체',
+			                        formatter: function (w) {
+			                            // 전체 합계를 계산하여 반환
+			                            return w.globals.seriesTotals.reduce((a, b) => {
+			                                return a + b
+			                            }, 0)
+			                        }
+			                    }
+			                }
+			            }
+			        }
+			    },
+			    legend: {
+			        position: 'bottom', // 범례 위치 설정
+			        horizontalAlign: 'center', // 범례 정렬 설정
+			        fontSize: '14px', // 범례 폰트 크기 설정
+			        markers: {
+			            width: 10,
+			            height: 10
+			        }
+			    },
+			    responsive: [{
+			        breakpoint: 480,
+			        options: {
+			            chart: {
+			                width: 300 // 반응형 디자인에서의 차트 크기 조정
+			            },
+			            legend: {
+			                position: 'bottom' // 반응형 디자인에서 범례 위치 조정
+			            }
+			        }
+			    }]
+			};
+		
+		if(!isLoaded) {
+			chart = new ApexCharts(document.querySelector("#charts"), options);
+			chart.render();
+			isLoaded = true;
+		}else{
+			chart.updateOptions({
+        		series: returnData.dataCount,
+				labels: returnData.dataLabel
+        	},true,true,true);
+			
+			chartType = '1';
+		}
+	} 
+	
+	function createChartDate(approvalList, chartType) {
+		let returnData = {};
+		let dataLabel = [];
+		let dataCount = [];
+		for(let i = 0; i<approvalList.length; i++) {
+			if(chartType == '1') {
+				dataLabel.push(approvalList[i].emplNm);
+			}else{
+				dataLabel.push(approvalList[i].deptNm);
+			}
+			dataCount.push(approvalList[i].count);
+		}
+		
+		returnData.dataLabel = dataLabel;
+		returnData.dataCount = dataCount;
+		
+		console.log(returnData);
+		return returnData;
+	}
+</script>

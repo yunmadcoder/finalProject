@@ -1,0 +1,68 @@
+package kr.or.ddit.groupware.service.rental;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException.Conflict;
+
+import kr.or.ddit.groupware.mapper.rental.IRentalMapper;
+import kr.or.ddit.groupware.util.Result;
+import kr.or.ddit.groupware.vo.RentalVO;
+@Service
+public class RentalServiceImpl implements IRentalService {
+
+	@Autowired
+	private IRentalMapper rentalMapper;
+
+	@Override
+	public Result RentVehicle(RentalVO rentalVO) {
+		Result res = null;
+
+		int cnt = rentalMapper.rentVehicle(rentalVO);
+
+		if (cnt > 0) {
+			res = Result.OK;
+		}
+		else {
+			{
+				res = Result.FAILED;
+			}
+		}
+		return res;
+	}
+
+	@Override
+	public Result RentSupplies(RentalVO rentalVO) {
+		Result res = null;
+
+		int cnt = rentalMapper.rentSupplies(rentalVO);
+
+		if (cnt > 0) {
+			res = Result.OK;
+		}
+		else {
+			{
+				res = Result.FAILED;
+			}
+		}
+		return res;
+	}
+
+	@Override
+	public List<RentalVO> getReservationsByResourceType(RentalVO rentalVO) {
+		return rentalMapper.findRentalByResourceType(rentalVO);
+	}
+
+	@Override
+	public boolean isRentalPossible(RentalVO rentalVO) {
+		List<RentalVO> conflicts = rentalMapper.findOverlappingRentals(
+				rentalVO.getErntNo(),
+				rentalVO.getErntBeginDt(),
+				rentalVO.getErntEndDt()
+				);
+		
+		return conflicts.size()==0;
+	}
+
+}

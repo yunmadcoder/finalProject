@@ -1,0 +1,54 @@
+package kr.or.ddit.groupware.controller.documents;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.or.ddit.groupware.service.documents.IDocumentsService;
+import kr.or.ddit.groupware.vo.DocumentsVO;
+
+@Controller
+@RequestMapping("/documents")
+public class DocumentsController {
+
+	@Inject
+	private IDocumentsService documentsService;
+	
+	ObjectMapper mapper = new ObjectMapper();
+	
+	/**
+	 * @method : selectDocumentsList
+	 * @auther : <strong>이명문</strong>
+	 * @return : JSON 형식의 documentsList
+	 * @date : 2024. 4. 17
+	 */
+	@ResponseBody
+	@GetMapping(value = "/doclist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public String selectDocumentsList() throws Exception {
+		List<DocumentsVO> documentsList = documentsService.selectDocumentsList();
+		return mapper.writeValueAsString(documentsList);
+	}
+	
+	@GetMapping("/manage")
+	public String DocumentManagement() {
+		
+		
+		return "documents/manage";
+	}
+	
+	@GetMapping("/insertdocform")
+	public String insertDocuments() {
+		
+		
+		return "documents/documentsinsert";
+	}
+}

@@ -1,0 +1,19 @@
+package kr.or.ddit.groupware.mapper.reservation;
+
+import java.util.List;
+
+import kr.or.ddit.groupware.vo.MtgRoomReservVO;
+
+/**
+ * 예약 및 대여 SQL Mapper
+ * @author 민경선
+ * @version 1.0
+ * @see IReservationMapper
+ */
+public interface IReservationMapper {
+
+	int addRoomReserv(MtgRoomReservVO roomReservVO);
+
+	List<MtgRoomReservVO> findReservationsByResourceType(MtgRoomReservVO roomReservVO);
+
+}

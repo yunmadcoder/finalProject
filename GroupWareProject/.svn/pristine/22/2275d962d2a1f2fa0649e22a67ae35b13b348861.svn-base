@@ -1,0 +1,57 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+	$(function() {
+		var errorMsg = "${errorMsg}";
+		if (errorMsg != "") {
+			alert(errorMsg);
+		}
+	});
+
+	function frmCheck() {
+		if ($("#code").val() == "") {
+			alert("코드를 입력해주세요.");
+			$("#code").focus();
+			return false;
+		}
+	}
+</script>
+<body>
+	<div id="sign-body">
+		<div class="form-signin">
+			<div  class="signin-box">
+				<div id="member-box" class="login-wrap text-cetner">
+					<div class="form-box">
+						<div class="login-top">
+							<h3 class="mb_10 fw-normal" style="font-weight: bold;">
+								<i class="xi-mouse"></i>OTP인증
+							</h3>
+						</div>
+						<div class="login-form">
+							<form action="${pageContext.request.contextPath}/test/api/check" onsubmit="return frmCheck();">
+								<ul class="login">
+									<p style="font-weight: bold;">키 인증 번호 :</p>
+									<input type="text" class="form-control" name="encodedKey" value="${encodedKey}" readonly="readonly" />
+									<p style="font-weight: bold;">바코드 주소 :</p>
+									<input type="text" class="form-control" value="${QrUrl}" readonly="readonly" />
+									</br>
+									<p style="font-weight: bold;">코드 입력창 :</p>
+									<input type="text" class="form-control" id="code" name="code" placeholder="코드를 입력해주세요" />
+								</ul>
+								<input type="submit" class="btn btn-lg btn-dark" value="전송" style="margin-top: 10px;">
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
